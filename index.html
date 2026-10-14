@@ -1,0 +1,2688 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Demonstração · Bora de Van 2.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* =========================================================
+       RESET & REGRAS VISUAIS ABSOLUTAS
+       ========================================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background-color: #020617;
+      color: #F1F5F9;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 5. FAIXA FIXA NO TOPO (NÃO SE FECHA NUNCA) */
+    #faixa-demonstracao-topo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background-color: #FACC15;
+      color: #020617;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      padding: 7px 12px;
+      line-height: 1.35;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    /* CONTAINER PRINCIPAL (ABAIXO DA FAIXA FIXA) */
+    #aplicacao {
+      padding-top: 50px;
+      padding-bottom: 96px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    /* CABEÇALHO FLUTUANTE */
+    #menu-cabecalho {
+      position: sticky;
+      top: 42px;
+      z-index: 900;
+      background: rgba(15, 23, 42, 0.90);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .bloco-marca {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .bloco-marca img {
+      height: 36px;
+      width: auto;
+      object-fit: contain;
+    }
+    .marca-nome {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+      color: #FFFFFF;
+    }
+    .destaque-gradiente {
+      background: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+    .botao-reserva-topo {
+      background: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%);
+      color: #FFFFFF;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      min-height: 48px;
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(219, 39, 119, 0.35);
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      white-space: nowrap;
+    }
+    .botao-reserva-topo:active {
+      transform: scale(0.96);
+    }
+
+    /* BARRA INFERIOR FLUTUANTE FIXA COM 4 ABAS */
+    #barra-navegacao-inferior {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 950;
+      background: rgba(15, 23, 42, 0.90);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 72px;
+      padding: 0 4px;
+      width: 100%;
+    }
+    .item-barra-inferior {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      min-height: 48px;
+      background: none;
+      border: none;
+      color: #64748B;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+    .item-barra-inferior svg {
+      width: 24px;
+      height: 24px;
+      stroke: currentColor;
+      transition: stroke 0.15s ease, transform 0.15s ease;
+    }
+    .item-barra-inferior.ativo {
+      color: #DB2777;
+    }
+    .item-barra-inferior.ativo svg {
+      stroke: #DB2777;
+      transform: translateY(-1px);
+    }
+
+    /* ÁREA DE CONTEÚDO */
+    .conteudo-telas {
+      width: 100%;
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 16px;
+      flex: 1;
+    }
+
+    /* SISTEMA DE TELAS */
+    .tela {
+      display: none;
+      animation: transicaoTela 0.2s ease-out;
+    }
+    .tela.ativa {
+      display: block;
+    }
+    @keyframes transicaoTela {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* TIPOGRAFIA */
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 34px;
+      line-height: 1.15;
+      color: #FFFFFF;
+      letter-spacing: -0.5px;
+    }
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 26px;
+      line-height: 1.2;
+      color: #FFFFFF;
+      letter-spacing: -0.4px;
+    }
+    h3 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+    }
+    p {
+      color: #94A3B8;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .texto-destaque {
+      color: #F1F5F9;
+    }
+
+    /* CARTÕES E BLOCOS */
+    .cartao {
+      background: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 16px;
+      width: 100%;
+    }
+    .cartao-pequeno {
+      background: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+
+    /* BOTÕES COM ALTURA ≥ 48px / ≥ 52px */
+    .botao-primario {
+      background: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%);
+      color: #FFFFFF;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      min-height: 52px;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      text-decoration: none;
+      box-shadow: 0 4px 16px rgba(219, 39, 119, 0.35);
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .botao-primario:active {
+      transform: scale(0.98);
+      opacity: 0.92;
+    }
+    .botao-secundario {
+      background: #0F172A;
+      color: #F1F5F9;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      min-height: 48px;
+      border-radius: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      text-decoration: none;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .botao-secundario:active {
+      background: #1E293B;
+      transform: scale(0.98);
+    }
+
+    /* SELOS E BADGES */
+    .selo-rosa {
+      display: inline-flex;
+      align-items: center;
+      background: #DB2777;
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 999px;
+      line-height: 1.2;
+    }
+    .selo-verde {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(16, 185, 129, 0.18);
+      color: #10B981;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .selo-azul {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(59, 130, 246, 0.18);
+      color: #3B82F6;
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .selo-amarelo {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(250, 204, 21, 0.18);
+      color: #FACC15;
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    /* ÍCONES DENTRO DE QUADRADOS DE 44px COM 15% DE OPACIDADE */
+    .quadrado-icone {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .quadrado-icone-rosa {
+      background: rgba(219, 39, 119, 0.15);
+      color: #DB2777;
+    }
+    .quadrado-icone-roxo {
+      background: rgba(124, 58, 237, 0.15);
+      color: #7C3AED;
+    }
+    .quadrado-icone-verde {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10B981;
+    }
+    .quadrado-icone-azul {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3B82F6;
+    }
+
+    /* FORMULÁRIOS & CAMPOS */
+    .campo-bloco {
+      margin-bottom: 16px;
+    }
+    .rotulo-campo {
+      display: block;
+      color: #E2E8F0;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .entrada-texto, select.entrada-texto {
+      width: 100%;
+      min-height: 48px;
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #F1F5F9;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      -webkit-appearance: none;
+    }
+    select.entrada-texto {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+    }
+    .entrada-texto:focus, select.entrada-texto:focus {
+      outline: none;
+      border-color: #7C3AED;
+      box-shadow: 0 0 0 2px #7C3AED;
+    }
+    .caixa-lgpd {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 14px 0 18px 0;
+      cursor: pointer;
+    }
+    .caixa-lgpd input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      min-height: 22px;
+      margin-top: 2px;
+      accent-color: #DB2777;
+      cursor: pointer;
+    }
+    .caixa-lgpd span {
+      color: #94A3B8;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    /* PASSO A PASSO (PÍLULAS NUMERADAS EM LINHA) */
+    .trilha-passos {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      margin: 18px 0 22px 0;
+    }
+    .trilha-passos::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      right: 20px;
+      height: 2px;
+      background: #1E293B;
+      z-index: 1;
+      transform: translateY(-50%);
+    }
+    .pilula-passo {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: #0F172A;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #64748B;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .circulo-numero-passo {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #1E293B;
+      color: #64748B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .pilula-passo.ativo {
+      background: #DB2777;
+      border-color: #DB2777;
+      color: #FFFFFF;
+    }
+    .pilula-passo.ativo .circulo-numero-passo {
+      background: #FFFFFF;
+      color: #DB2777;
+    }
+    .pilula-passo.concluido {
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #10B981;
+    }
+    .pilula-passo.concluido .circulo-numero-passo {
+      background: #10B981;
+      color: #FFFFFF;
+    }
+
+    /* INTERRUPTOR (TOGGLE) */
+    .bloco-interruptor {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      background: #1E293B;
+      border-radius: 16px;
+      margin: 16px 0;
+    }
+    .chave-alavanca {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+    .chave-alavanca input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .chave-fundo {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155;
+      transition: .3s;
+      border-radius: 999px;
+    }
+    .chave-fundo:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    .chave-alavanca input:checked + .chave-fundo {
+      background-color: #10B981;
+    }
+    .chave-alavanca input:checked + .chave-fundo:before {
+      transform: translateX(24px);
+    }
+
+    /* CARTELA DE FIDELIDADE DE 10 CARIMBOS */
+    .grade-fidelidade-10 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 18px 0;
+    }
+    .carimbo-bolinha {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 2px dashed #334155;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #64748B;
+      background: #020617;
+    }
+    .carimbo-bolinha.marcado {
+      border: 2px solid #DB2777;
+      background: rgba(219, 39, 119, 0.2);
+      color: #DB2777;
+    }
+
+    /* CONTROLE NUMÉRICO COM BOTÕES - E + (ALTURA ≥ 48px) */
+    .seletor-quantidade {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #1E293B;
+      border-radius: 14px;
+      padding: 4px;
+    }
+    .botao-mais-menos {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      border: none;
+      background: #0F172A;
+      color: #FFFFFF;
+      font-size: 22px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease;
+    }
+    .botao-mais-menos:active {
+      background: #334155;
+    }
+    .valor-quantidade-exibido {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: #F1F5F9;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    /* BARRAS HORIZONTAIS EM CSS PURO */
+    .linha-grafico-barra {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .rotulo-grafico {
+      width: 44px;
+      font-size: 13px;
+      color: #94A3B8;
+      font-weight: 600;
+    }
+    .pista-grafico {
+      flex: 1;
+      height: 18px;
+      background: #1E293B;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .preenchimento-grafico {
+      height: 100%;
+      border-radius: 999px;
+      background: #334155;
+    }
+    .preenchimento-grafico.destaque-pico {
+      background: linear-gradient(90deg, #7C3AED 0%, #DB2777 100%);
+    }
+    .valor-grafico {
+      width: 42px;
+      font-size: 13px;
+      color: #F1F5F9;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    /* PARADAS NA TELA MOTORISTA */
+    .cartao-parada {
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+      transition: opacity 0.2s;
+    }
+    .cartao-parada.concluida {
+      opacity: 0.45;
+      text-decoration: line-through;
+    }
+    .acoes-parada {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    @media (min-width: 420px) {
+      .acoes-parada {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+    }
+    .botao-acao-rota {
+      min-height: 48px;
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      flex: 1;
+    }
+    .botao-rota-waze {
+      background: #334155;
+      color: #38BDF8;
+    }
+    .botao-rota-waze:active {
+      background: #475569;
+    }
+    .botao-rota-whats {
+      background: rgba(16, 185, 129, 0.18);
+      color: #10B981;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .botao-rota-whats:active {
+      background: rgba(16, 185, 129, 0.28);
+    }
+    .botao-rota-desembarque {
+      background: #0F172A;
+      color: #F1F5F9;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .botao-rota-desembarque:active {
+      background: #1E293B;
+    }
+
+    /* RECOLHÍVEL (CONTATO DE EMERGÊNCIA) */
+    .cabecalho-recolhivel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: 12px 0;
+      color: #E2E8F0;
+      font-weight: 600;
+    }
+    .corpo-recolhivel {
+      display: none;
+      padding-top: 10px;
+    }
+    .corpo-recolhivel.aberto {
+      display: block;
+    }
+
+    /* GRADES E UTILITÁRIOS */
+    .grade-dupla {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .mt-8 { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mb-8 { margin-bottom: 8px; }
+    .mb-12 { margin-bottom: 12px; }
+    .mb-16 { margin-bottom: 16px; }
+    .texto-miudo { font-size: 13px; }
+    .texto-verde { color: #10B981; }
+    .texto-vermelho { color: #EF4444; }
+    .texto-amarelo { color: #FACC15; }
+    .texto-apagado { color: #64748B; }
+    .alinhado-centro { text-align: center; }
+
+    /* LAYOUT DA CAPA (HERO) */
+    .secao-capa {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .logo-capa {
+      width: 220px;
+      max-width: 80%;
+      height: auto;
+      margin-bottom: 16px;
+    }
+    @media (min-width: 600px) {
+      .secao-capa {
+        flex-direction: row-reverse;
+        text-align: left;
+        justify-content: space-between;
+      }
+      .logo-capa {
+        margin-bottom: 0;
+        margin-left: 20px;
+      }
+    }
+
+    /* RODAPÉ EM TODAS AS TELAS */
+    .rodape-geral {
+      text-align: center;
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      color: #64748B;
+      font-size: 13px;
+    }
+    .rodape-geral a {
+      color: #94A3B8;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 5. FAIXA FIXA NO TOPO (NUNCA FECHA) -->
+  <div id="faixa-demonstracao-topo">
+    DEMONSTRAÇÃO · sem validade oficial · não é um serviço da Bora de Van · dados fictícios
+  </div>
+
+  <div id="aplicacao">
+
+    <!-- CABEÇALHO COM LOGO E BOTÃO EM PÍLULA -->
+    <header id="menu-cabecalho">
+      <div class="bloco-marca" onclick="abrirTela('inicio')">
+        <img src="https://www.boradevan.com.br/BDV.webp" alt="Bora de Van" onerror="this.style.display='none'">
+        <span class="marca-nome">Bora de <span class="destaque-gradiente">Van</span></span>
+      </div>
+      <button class="botao-reserva-topo" onclick="abrirTela('passageiro')">Reserve Agora</button>
+    </header>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="conteudo-telas">
+
+      <!-- ==============================================
+           TELA 0: INÍCIO (CAPA DE VENDA)
+           ============================================== -->
+      <section id="tela-inicio" class="tela ativa">
+        <div class="secao-capa">
+          <img src="https://www.boradevan.com.br/BDV.webp" alt="Bora de Van" class="logo-capa" onerror="this.style.display='none'">
+          <div>
+            <div class="selo-rosa mb-12">Demonstração Interativa</div>
+            <h1>Cada passageiro <span class="destaque-gradiente">vira cliente.</span></h1>
+            <p class="mt-12">Cadastro por QR Code na van, Pix que cai confirmado, rota pronta no Waze e aviso para quem já viajou com vocês.</p>
+          </div>
+        </div>
+
+        <!-- 3 CARTÕES COM NÚMERO GRANDE -->
+        <div class="cartao">
+          <div class="quadrado-icone quadrado-icone-rosa mb-12">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div style="font-family:'Outfit',sans-serif; font-size: 32px; font-weight:800; color:#FFFFFF;">R$ <span class="dado-preco-pix">55</span></div>
+          <p class="mt-8 texto-destaque">é o que um lugar vazio custa. O sistema avisa quem já viajou e enche a van.</p>
+        </div>
+
+        <div class="cartao">
+          <div class="quadrado-icone quadrado-icone-verde mb-12">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div style="font-family:'Outfit',sans-serif; font-size: 32px; font-weight:800; color:#FFFFFF;">0 comprovante falso</div>
+          <p class="mt-8 texto-destaque">o Pix só aparece como pago quando o dinheiro entrou.</p>
+        </div>
+
+        <div class="cartao">
+          <div class="quadrado-icone quadrado-icone-azul mb-12">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          </div>
+          <div style="font-family:'Outfit',sans-serif; font-size: 32px; font-weight:800; color:#FFFFFF;">1 toque</div>
+          <p class="mt-8 texto-destaque">o motorista abre a próxima parada no Waze.</p>
+        </div>
+
+        <!-- BOTÃO PRINCIPAL (VER QUANTO VOCÊS GANHAM) -->
+        <button class="botao-primario mb-12" onclick="abrirTela('simulador')">
+          Ver quanto vocês ganham
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
+
+        <!-- 3 BOTÕES SECUNDÁRIOS -->
+        <div style="display:flex; flex-direction:column; gap:10px;" class="mb-16">
+          <button class="botao-secundario" onclick="abrirTela('passageiro')">Sou passageiro</button>
+          <button class="botao-secundario" onclick="abrirTela('motorista')">Sou motorista</button>
+          <button class="botao-secundario" onclick="abrirTela('central')">Sou a central</button>
+        </div>
+
+        <!-- SELO DISCRETO -->
+        <div class="cartao-pequeno alinhado-centro" style="border-color: rgba(219, 39, 119, 0.3); background: rgba(219, 39, 119, 0.06);">
+          <p class="texto-miudo" style="color: #F1F5F9; font-weight: 500;">
+            🌟 <strong>Primeira empresa da linha:</strong> preço de fundador e exclusividade na rota por 12 meses.
+          </p>
+        </div>
+
+        <div class="rodape-geral">
+          Demonstração feita pela <a href="https://opusaitech.com" target="_blank" rel="noopener" class="link-rodape-assinatura">Opus AI</a> · sem vínculo oficial com a Bora de Van.
+        </div>
+      </section>
+
+
+      <!-- ==============================================
+           TELA 1: PASSAGEIRO
+           ============================================== -->
+      <section id="tela-passageiro" class="tela">
+        <!-- ABAS DE OPÇÃO NO TOPO -->
+        <div style="display:flex; gap:8px; margin-bottom: 16px;">
+          <button id="botao-aba-1a" class="botao-secundario" style="flex:1; min-height:48px; font-size:14px; background:#DB2777; border-color:#DB2777;" onclick="alternarOpcaoPassageiro('1a')">
+            Embarque no Jabaquara
+          </button>
+          <button id="botao-aba-1b" class="botao-secundario" style="flex:1; min-height:48px; font-size:14px;" onclick="alternarOpcaoPassageiro('1b')">
+            Agendar busca em Praia Grande
+          </button>
+        </div>
+
+        <!-- FLUXO 1A: EMBARQUE NO JABAQUARA -->
+        <div id="painel-opcao-1a">
+          <!-- INDICAÇÃO NO TOPO -->
+          <div class="cartao-pequeno mb-16" style="border-left: 4px solid #DB2777;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="selo-rosa">VAN 03</span>
+              <span class="texto-miudo texto-verde" style="font-weight:700;">9 de 15 lugares</span>
+            </div>
+            <div class="mt-8 texto-destaque" style="font-weight:600; font-size:15px;">
+              Você está na VAN 03 · saída prevista 18h20 · 9 de 15 lugares
+            </div>
+          </div>
+
+          <!-- BARRA DE PROGRESSO DE 3 PONTOS -->
+          <div class="trilha-passos">
+            <div id="progresso-passo-1" class="pilula-passo ativo">
+              <span class="circulo-numero-passo">1</span>
+              <span>WhatsApp</span>
+            </div>
+            <div id="progresso-passo-2" class="pilula-passo">
+              <span class="circulo-numero-passo">2</span>
+              <span>Destino</span>
+            </div>
+            <div id="progresso-passo-3" class="pilula-passo">
+              <span class="circulo-numero-passo">3</span>
+              <span>Pagamento</span>
+            </div>
+          </div>
+
+          <!-- PASSO 1: QUEM É VOCÊ -->
+          <div id="etapa-1" class="cartao">
+            <h3>Quem é você</h3>
+            <p class="texto-miudo mb-16">Seus dados para confirmar a vaga na van.</p>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="campo-nome-1a">Nome completo</label>
+              <input type="text" id="campo-nome-1a" class="entrada-texto" placeholder="Ex.: Ana Paula Souza">
+            </div>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="campo-whats-1a">WhatsApp</label>
+              <input type="tel" id="campo-whats-1a" class="entrada-texto" placeholder="(13) 9 0000-00XX" oninput="verificarNumeroPassageiro(this.value)">
+              <div class="mt-8" style="display:flex; gap:8px; align-items:center;">
+                <span class="texto-miudo texto-apagado">Atalho:</span>
+                <button type="button" class="selo-azul" style="cursor:pointer; border:none; padding:6px 12px; min-height:36px;" onclick="preencherClienteAna()">
+                  Cliente antiga: (13) 9 0000-0007
+                </button>
+              </div>
+            </div>
+
+            <!-- MENSAGEM QUANDO RECONHECER CLIENTE ANTIGA -->
+            <div id="alerta-cliente-reconhecida" class="cartao-pequeno mb-16" style="display:none; background:rgba(124,58,237,0.18); border-color:#7C3AED;">
+              <div style="color:#C4B5FD; font-weight:700; font-size:15px;">
+                👋 Que bom ter você de volta, Ana! Esta é a sua 7ª viagem.
+              </div>
+              <p class="texto-miudo mt-8" style="color:#F1F5F9;">
+                Endereço salvo no Boqueirão. Pulando direto para o pagamento!
+              </p>
+            </div>
+
+            <label class="caixa-lgpd">
+              <input type="checkbox" id="check-lgpd-1a" checked>
+              <span>Autorizo a Bora de Van a guardar meus dados para a viagem e para me avisar de novas saídas (LGPD).</span>
+            </label>
+
+            <button class="botao-primario" onclick="prosseguirEtapa1()">
+              Avançar
+            </button>
+          </div>
+
+          <!-- PASSO 2: PARA ONDE -->
+          <div id="etapa-2" class="cartao" style="display:none;">
+            <h3>Para onde</h3>
+            <p class="texto-miudo mb-16">Informe onde você vai desembarcar em Praia Grande.</p>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="campo-bairro-1a">Bairro</label>
+              <select id="campo-bairro-1a" class="entrada-texto">
+                <option value="Boqueirão">Boqueirão</option>
+                <option value="Guilhermina">Guilhermina</option>
+                <option value="Aviação">Aviação</option>
+                <option value="Tupi">Tupi</option>
+                <option value="Ocian">Ocian</option>
+                <option value="Mirim">Mirim</option>
+                <option value="Caiçara">Caiçara</option>
+                <option value="Real">Real</option>
+                <option value="Solemar">Solemar</option>
+                <option value="Canto do Forte">Canto do Forte</option>
+                <option value="Maracanã">Maracanã</option>
+                <option value="Vila Sônia">Vila Sônia</option>
+              </select>
+            </div>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="campo-endereco-1a">Endereço</label>
+              <input type="text" id="campo-endereco-1a" class="entrada-texto" placeholder="Ex.: Rua das Flores">
+            </div>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="campo-numero-1a">Número</label>
+              <input type="text" id="campo-numero-1a" class="entrada-texto" placeholder="Ex.: 120">
+            </div>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="campo-referencia-1a">Ponto de referência (opcional)</label>
+              <input type="text" id="campo-referencia-1a" class="entrada-texto" placeholder="Ex.: Perto da praia">
+            </div>
+
+            <div style="display:flex; gap:10px;">
+              <button class="botao-secundario" style="flex:1;" onclick="irParaEtapa(1)">Voltar</button>
+              <button class="botao-primario" style="flex:2;" onclick="prosseguirEtapa2()">Avançar</button>
+            </div>
+          </div>
+
+          <!-- PASSO 3: PAGAMENTO -->
+          <div id="etapa-3" class="cartao" style="display:none;">
+            <h3>Pagamento</h3>
+            <p class="texto-miudo mb-16">Escolha como prefere pagar sua passagem:</p>
+
+            <!-- RESUMO DO ENDEREÇO SALVO -->
+            <div id="card-endereco-confirmado" class="cartao-pequeno mb-16" style="background:#1E293B; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <span class="texto-miudo texto-apagado">Destino:</span>
+                <div id="texto-exibe-destino" style="font-size:14px; font-weight:600; color:#F1F5F9;">Boqueirão · Rua das Flores, 120</div>
+              </div>
+              <button class="selo-rosa" style="cursor:pointer; border:none; padding:6px 12px; min-height:40px;" onclick="trocarEnderecoSalvo()">Trocar endereço</button>
+            </div>
+
+            <!-- OPÇÃO 1: PIX -->
+            <div class="cartao-pequeno mb-12">
+              <button class="botao-primario mb-12" style="min-height:54px;" onclick="abrirPagamentoPix()">
+                Pix R$ <span class="dado-preco-pix">55</span>
+              </button>
+
+              <div id="detalhes-pix" style="display:none; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);">
+                <div style="display:flex; gap:14px; align-items:center; margin-bottom:12px;">
+                  <div style="width:72px; height:72px; background:#334155; border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:700; color:#94A3B8; font-size:13px; text-align:center;">
+                    QR Pix
+                  </div>
+                  <div style="flex:1;">
+                    <span class="rotulo-campo" style="margin-bottom:4px;">Pix copia e cola:</span>
+                    <input type="text" id="codigo-pix-copia" class="entrada-texto" style="font-size:13px; min-height:44px; padding:6px 10px;" readonly value="00020126580014br.gov.bcb.pix0136boradevan-pix-55reais520400005303986540555.005802BR5911Bora de Van6009Sao Paulo62070503***6304ABCD">
+                  </div>
+                </div>
+
+                <button id="botao-copiar-codigo-pix" class="botao-secundario mb-12" style="min-height:48px;" onclick="copiarCodigoPix()">
+                  Copiar
+                </button>
+
+                <div id="aviso-esperando-pix" class="texto-miudo texto-amarelo alinhado-centro" style="padding:6px;">
+                  Aguardando confirmação do banco...
+                </div>
+                <div id="aviso-pix-confirmado" class="selo-verde" style="display:none; width:100%; justify-content:center; padding:12px; font-size:15px;">
+                  ✓ Pagamento confirmado
+                </div>
+              </div>
+            </div>
+
+            <!-- OPÇÃO 2: CARTÃO -->
+            <div class="cartao-pequeno mb-12">
+              <button class="botao-secundario mb-8" style="min-height:52px; font-size:16px;" onclick="abrirPagamentoCartao()">
+                Cartão R$ <span class="dado-preco-cartao">59</span>
+              </button>
+              <div id="detalhes-cartao" style="display:none; padding-top:8px;">
+                <p class="texto-destaque texto-miudo mb-12">O motorista passa a maquininha.</p>
+                <button class="botao-primario" onclick="finalizarPassageiro('Cartão')">Confirmar embarque</button>
+              </div>
+            </div>
+
+            <!-- OPÇÃO 3: CRÉDITO DO PACOTE -->
+            <div class="cartao-pequeno mb-12">
+              <button class="botao-secundario mb-8" style="min-height:52px; font-size:16px;" onclick="abrirPagamentoCredito()">
+                Usar crédito do pacote
+              </button>
+              <div id="detalhes-credito" style="display:none; padding-top:8px;">
+                <p class="texto-destaque texto-miudo mb-12">Restam 6 viagens no seu pacote.</p>
+                <button class="botao-primario" onclick="finalizarPassageiro('Crédito')">Usar 1 crédito e confirmar</button>
+              </div>
+            </div>
+
+            <button class="botao-secundario mt-8" onclick="irParaEtapa(2)">Voltar</button>
+          </div>
+
+          <!-- TELA FINAL 1A: TUDO CERTO! -->
+          <div id="etapa-sucesso" class="cartao" style="display:none;">
+            <div class="alinhado-centro mb-16">
+              <div class="quadrado-icone quadrado-icone-verde" style="margin:0 auto 12px auto; width:56px; height:56px;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <h2>Tudo certo!</h2>
+              <p class="texto-verde" style="font-weight:700;">Embarque confirmado na VAN 03</p>
+            </div>
+
+            <!-- CARTELA DE FIDELIDADE (10 CÍRCULOS) -->
+            <div class="cartao-pequeno">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:700; color:#FFFFFF; font-size:15px;">Cartela de fidelidade</span>
+                <span id="rotulo-selo-fidelidade" class="selo-rosa">7 de 10</span>
+              </div>
+              <p id="frase-carimbos-fidelidade" class="texto-miudo mt-8">7 de 10 — a 10ª é por nossa conta</p>
+              
+              <div id="grade-carimbos-conteudo" class="grade-fidelidade-10">
+                <!-- 10 carimbos preenchidos por JS -->
+              </div>
+            </div>
+
+            <!-- INTERRUPTOR LIGADO -->
+            <div class="bloco-interruptor">
+              <span class="texto-destaque" style="font-size:15px; font-weight:600;">Me avise quando sair van para Praia Grande</span>
+              <label class="chave-alavanca">
+                <input type="checkbox" id="chave-aviso-saidas" checked>
+                <span class="chave-fundo"></span>
+              </label>
+            </div>
+
+            <!-- CONTATO DE EMERGÊNCIA (OPCIONAL, RECOLHIDO) -->
+            <div class="cartao-pequeno">
+              <div class="cabecalho-recolhivel" onclick="alternarGavetaEmergencia()">
+                <span>Contato de emergência (opcional)</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div id="gaveta-emergencia" class="corpo-recolhivel">
+                <p class="texto-miudo mb-12">É só para o caso de alguma urgência na viagem.</p>
+                <div class="campo-bloco">
+                  <label class="rotulo-campo" for="emg-nome-campo">Nome do contato</label>
+                  <input type="text" id="emg-nome-campo" class="entrada-texto" placeholder="Ex.: Paulo Souza">
+                </div>
+                <div class="campo-bloco">
+                  <label class="rotulo-campo" for="emg-tel-campo">Telefone do contato</label>
+                  <input type="tel" id="emg-tel-campo" class="entrada-texto" placeholder="(13) 9 0000-0088">
+                </div>
+                <button class="botao-secundario" style="min-height:48px;" onclick="gravarContatoEmergencia()">Salvar contato</button>
+              </div>
+            </div>
+
+            <button class="botao-primario mt-16" onclick="abrirTela('inicio')">
+              Voltar ao início
+            </button>
+          </div>
+        </div>
+
+
+        <!-- ==============================================
+             FLUXO 1B: AGENDAR BUSCA EM PRAIA GRANDE
+             ============================================== -->
+        <div id="painel-opcao-1b" style="display:none;">
+          <div class="cartao-pequeno mb-16" style="border-left: 4px solid #7C3AED;">
+            <div class="texto-destaque" style="font-weight:700; font-size:15px;">
+              Agendamento de Busca · Praia Grande ➔ Jabaquara
+            </div>
+            <p class="texto-miudo mt-8">A van busca você no seu endereço no horário marcado.</p>
+          </div>
+
+          <div id="formulario-agendamento-1b" class="cartao">
+            <h3>Seus dados</h3>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="ag-nome-campo">Nome completo</label>
+              <input type="text" id="ag-nome-campo" class="entrada-texto" placeholder="Ex.: Mariana Dias">
+            </div>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="ag-whats-campo">WhatsApp</label>
+              <input type="tel" id="ag-whats-campo" class="entrada-texto" placeholder="(13) 9 0000-00XX">
+            </div>
+
+            <h3 class="mt-16">Endereço de busca</h3>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="ag-bairro-campo">Bairro</label>
+              <select id="ag-bairro-campo" class="entrada-texto">
+                <option value="Boqueirão">Boqueirão</option>
+                <option value="Guilhermina">Guilhermina</option>
+                <option value="Aviação">Aviação</option>
+                <option value="Tupi">Tupi</option>
+                <option value="Ocian">Ocian</option>
+                <option value="Mirim">Mirim</option>
+                <option value="Caiçara">Caiçara</option>
+                <option value="Real">Real</option>
+                <option value="Solemar">Solemar</option>
+                <option value="Canto do Forte">Canto do Forte</option>
+                <option value="Maracanã">Maracanã</option>
+                <option value="Vila Sônia">Vila Sônia</option>
+              </select>
+            </div>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="ag-endereco-campo">Endereço</label>
+              <input type="text" id="ag-endereco-campo" class="entrada-texto" placeholder="Ex.: Rua Copacabana">
+            </div>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="ag-numero-campo">Número</label>
+              <input type="text" id="ag-numero-campo" class="entrada-texto" placeholder="Ex.: 310">
+            </div>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="ag-referencia-campo">Ponto de referência (opcional)</label>
+              <input type="text" id="ag-referencia-campo" class="entrada-texto" placeholder="Ex.: Padaria Central">
+            </div>
+
+            <h3 class="mt-16">Data e Janela de horário</h3>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo" for="ag-data-campo">Data da viagem</label>
+              <input type="date" id="ag-data-campo" class="entrada-texto">
+            </div>
+
+            <div class="campo-bloco">
+              <label class="rotulo-campo">Janela de horário</label>
+              <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:8px;" id="grade-botoes-janela">
+                <button type="button" class="botao-secundario item-opcao-janela" style="min-height:48px;" onclick="marcarJanela('6h–7h', this)">6h–7h</button>
+                <button type="button" class="botao-secundario item-opcao-janela" style="min-height:48px;" onclick="marcarJanela('7h–8h', this)">7h–8h</button>
+                <button type="button" class="botao-secundario item-opcao-janela" style="min-height:48px;" onclick="marcarJanela('8h–9h', this)">8h–9h</button>
+                <button type="button" class="botao-secundario item-opcao-janela" style="min-height:48px;" onclick="marcarJanela('10h–11h', this)">10h–11h</button>
+                <button type="button" class="botao-secundario item-opcao-janela" style="min-height:48px; grid-column:span 2;" onclick="marcarJanela('14h–15h', this)">14h–15h</button>
+              </div>
+            </div>
+
+            <h3 class="mt-16">Quantas pessoas</h3>
+            <div class="grade-dupla mb-16">
+              <div>
+                <label class="rotulo-campo">Adultos</label>
+                <div class="seletor-quantidade">
+                  <button type="button" class="botao-mais-menos" onclick="mudarQtdPessoas('adultos', -1)">−</button>
+                  <span id="valor-adultos-1b" class="valor-quantidade-exibido">1</span>
+                  <button type="button" class="botao-mais-menos" onclick="mudarQtdPessoas('adultos', 1)">+</button>
+                </div>
+              </div>
+              <div>
+                <label class="rotulo-campo">Crianças</label>
+                <div class="seletor-quantidade">
+                  <button type="button" class="botao-mais-menos" onclick="mudarQtdPessoas('criancas', -1)">−</button>
+                  <span id="valor-criancas-1b" class="valor-quantidade-exibido">0</span>
+                  <button type="button" class="botao-mais-menos" onclick="mudarQtdPessoas('criancas', 1)">+</button>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="mt-16">Bagagem</h3>
+            <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:8px;" class="mb-16">
+              <button type="button" class="botao-secundario item-opcao-bagagem" style="min-height:48px;" onclick="marcarBagagem('nenhuma', this)">Nenhuma</button>
+              <button type="button" class="botao-secundario item-opcao-bagagem" style="min-height:48px;" onclick="marcarBagagem('mochila', this)">Mochila</button>
+              <button type="button" class="botao-secundario item-opcao-bagagem" style="min-height:48px;" onclick="marcarBagagem('mala pequena', this)">Mala pequena</button>
+              <button type="button" class="botao-secundario item-opcao-bagagem" style="min-height:48px;" onclick="marcarBagagem('mala grande', this)">Mala grande</button>
+            </div>
+
+            <label class="caixa-lgpd">
+              <input type="checkbox" id="check-lgpd-1b" checked>
+              <span>Autorizo a Bora de Van a guardar meus dados para a viagem e para me avisar de novas saídas (LGPD).</span>
+            </label>
+
+            <button class="botao-primario" onclick="concluirAgendamento1B()">
+              Solicitar agendamento
+            </button>
+          </div>
+
+          <!-- TELA FINAL 1B -->
+          <div id="sucesso-agendamento-1b" class="cartao alinhado-centro" style="display:none;">
+            <div class="quadrado-icone quadrado-icone-verde" style="margin:0 auto 16px auto; width:56px; height:56px;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h2>Pedido recebido.</h2>
+            <p class="texto-destaque mt-8 mb-16">A central confirma pelo WhatsApp.</p>
+            <div class="cartao-pequeno mb-20" style="background:#1E293B; border-color:#10B981;">
+              <span class="texto-verde" style="font-weight:700;">✓ Integrado ao painel da central</span>
+              <p class="texto-miudo mt-4">Este pedido já aparece na lista "Buscas de amanhã" da Central.</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <button class="botao-primario" onclick="abrirTela('central')">Ver no painel da Central</button>
+              <button class="botao-secundario" onclick="abrirTela('inicio')">Voltar ao início</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="rodape-geral">
+          Demonstração feita pela <a href="https://opusaitech.com" target="_blank" rel="noopener" class="link-rodape-assinatura">Opus AI</a> · sem vínculo oficial com a Bora de Van.
+        </div>
+      </section>
+
+
+      <!-- ==============================================
+           TELA 2: MOTORISTA
+           ============================================== -->
+      <section id="tela-motorista" class="tela">
+        <!-- SELETOR NO TOPO -->
+        <div style="display:flex; gap:6px; margin-bottom: 14px;">
+          <button class="botao-secundario seletor-van-item" style="flex:1; min-height:48px;" onclick="trocarVanAtiva('VAN 01')">VAN 01</button>
+          <button class="botao-secundario seletor-van-item" style="flex:1; min-height:48px;" onclick="trocarVanAtiva('VAN 02')">VAN 02</button>
+          <button class="botao-secundario seletor-van-item ativa" style="flex:1; min-height:48px; background:#DB2777; border-color:#DB2777;" onclick="trocarVanAtiva('VAN 03')">VAN 03</button>
+          <button class="botao-secundario seletor-van-item" style="flex:1; min-height:48px;" onclick="trocarVanAtiva('VAN 04')">VAN 04</button>
+        </div>
+
+        <!-- CARTÃO DA VIAGEM -->
+        <div class="cartao mb-16">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="selo-rosa" id="tag-motorista-van">VAN 03 · Cláudio</span>
+            <span class="selo-verde" id="tag-motorista-lugares">13 de 15 lugares</span>
+          </div>
+          <h2 style="font-size:22px; margin-top:4px;" id="titulo-viagem-motorista">18h20 · Jabaquara → Praia Grande</h2>
+          <p class="texto-destaque mt-8" id="subtitulo-viagem-motorista">
+            13 de 15 lugares · 12 pagos · 1 no cartão
+          </p>
+        </div>
+
+        <!-- DOIS BOTÕES GRANDES QUE SUBSTITUEM O ÁUDIO -->
+        <div class="grade-dupla mb-16">
+          <button class="botao-primario" style="min-height:56px; font-size:15px; padding:8px 12px; text-align:center;" onclick="avisarSaidaTerminal()">
+            Saí do terminal
+          </button>
+          <button class="botao-secundario" style="min-height:56px; font-size:15px; padding:8px 12px; text-align:center;" onclick="avisarChegadaPG()">
+            Cheguei em Praia Grande
+          </button>
+        </div>
+
+        <!-- CONFIRMAÇÃO DO AVISO -->
+        <div id="quadro-aviso-central" class="cartao-pequeno mb-16 alinhado-centro" style="display:none; background:rgba(16,185,129,0.14); border-color:#10B981;">
+          <span class="texto-verde" style="font-weight:700;" id="texto-aviso-central-hora">Central avisada às 18h23</span>
+        </div>
+
+        <!-- LISTA DE PASSAGEIROS E BOTÃO ORGANIZAR ROTA -->
+        <div class="cartao">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <h3>Passageiros</h3>
+            <button class="botao-reserva-topo" style="font-size:14px; padding:8px 16px; min-height:44px;" onclick="executarOrdenacaoVizinhoProximo()">
+              Organizar rota
+            </button>
+          </div>
+          <p class="texto-miudo mb-16" id="rotulo-ajuda-rota">
+            Toque em "Organizar rota" para ordenar as paradas do início ao fim de Praia Grande.
+          </p>
+
+          <!-- LISTA DINÂMICA DE PARADAS -->
+          <div id="lista-paradas-conteudo">
+            <!-- Gerado via JS -->
+          </div>
+
+          <!-- BOTÃO ROTA INTEIRA NO GOOGLE MAPS -->
+          <div class="mt-16" id="bloco-link-gmaps">
+            <a id="botao-rota-google-maps" href="https://www.google.com/maps" target="_blank" rel="noopener" class="botao-secundario" style="min-height:50px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              Rota inteira no Google Maps
+            </a>
+            <p class="texto-miudo alinhado-centro mt-8 texto-apagado">mostra as próximas paradas</p>
+          </div>
+        </div>
+
+        <!-- AVISO PEQUENO NO FIM -->
+        <p class="texto-miudo alinhado-centro mt-12 texto-apagado">
+          Use os botões com a van parada.
+        </p>
+
+        <div class="rodape-geral">
+          Demonstração feita pela <a href="https://opusaitech.com" target="_blank" rel="noopener" class="link-rodape-assinatura">Opus AI</a> · sem vínculo oficial com a Bora de Van.
+        </div>
+      </section>
+
+
+      <!-- ==============================================
+           TELA 3: CENTRAL (O PAINEL DO DONO)
+           ============================================== -->
+      <section id="tela-central" class="tela">
+        <div class="mb-16">
+          <div class="selo-rosa mb-8">Painel da Central</div>
+          <h2>Visão geral do dia</h2>
+          <p class="texto-miudo">Números em tempo real da operação e controle da frota.</p>
+        </div>
+
+        <!-- 4 NÚMEROS LADO A LADO EM 2 COLUNAS -->
+        <div class="grade-dupla mb-16">
+          <div class="cartao-pequeno">
+            <span class="texto-miudo texto-apagado">Passageiros hoje</span>
+            <div style="font-family:'Outfit',sans-serif; font-size:28px; font-weight:800; color:#FFFFFF; margin-top:4px;">214</div>
+          </div>
+          <div class="cartao-pequeno">
+            <span class="texto-miudo texto-apagado">Recebido hoje</span>
+            <div style="font-family:'Outfit',sans-serif; font-size:28px; font-weight:800; color:#10B981; margin-top:4px;">R$ 11.770</div>
+          </div>
+          <div class="cartao-pequeno">
+            <span class="texto-miudo texto-apagado">Viagens</span>
+            <div style="font-family:'Outfit',sans-serif; font-size:28px; font-weight:800; color:#FFFFFF; margin-top:4px;">16</div>
+          </div>
+          <div class="cartao-pequeno">
+            <span class="texto-miudo texto-apagado">Ocupação média</span>
+            <div style="font-family:'Outfit',sans-serif; font-size:28px; font-weight:800; color:#3B82F6; margin-top:4px;">87%</div>
+          </div>
+        </div>
+
+        <!-- BLOCO 1: VANS AGORA -->
+        <div class="cartao mb-16">
+          <h3>1. Vans agora</h3>
+          <p class="texto-miudo mb-16">Situação atual da frota na rota:</p>
+          <div id="tabela-frota-central" style="display:flex; flex-direction:column; gap:10px;">
+            <!-- Gerado via JS -->
+          </div>
+        </div>
+
+        <!-- BLOCO 2: HORÁRIOS MAIS CHEIOS -->
+        <div class="cartao mb-16">
+          <h3>2. Horários mais cheios</h3>
+          <p class="texto-miudo mb-16">Ocupação das vans de 5h a 22h:</p>
+          <div id="linhas-horarios-pico">
+            <!-- Barras em CSS puro geradas via JS -->
+          </div>
+          <div class="cartao-pequeno mt-16" style="background:#1E293B; border-color:rgba(250,204,21,0.25);">
+            <p class="texto-miudo texto-amarelo" style="font-weight:600;">
+              💡 Às 14h sobra lugar: hora de mandar promoção.
+            </p>
+          </div>
+        </div>
+
+        <!-- BLOCO 3: BAIRROS MAIS PEDIDOS -->
+        <div class="cartao mb-16">
+          <h3>3. Bairros mais pedidos</h3>
+          <p class="texto-miudo mb-16">Os 5 destinos mais frequentes em Praia Grande:</p>
+          <div id="linhas-top-bairros">
+            <!-- Top 5 gerado via JS -->
+          </div>
+        </div>
+
+        <!-- BLOCO 4: CLIENTES -->
+        <div class="cartao mb-16">
+          <h3>4. Clientes</h3>
+          <div class="cartao-pequeno mb-16" style="background:#1E293B;">
+            <p class="texto-destaque" style="font-weight:700;">
+              1.284 cadastrados · 61% já voltaram · 212 com 10+ viagens
+            </p>
+          </div>
+          <h4 class="mb-12" style="font-size:16px; color:#E2E8F0;">Melhores clientes</h4>
+          <div id="lista-clientes-destaque" style="display:flex; flex-direction:column; gap:8px;">
+            <!-- 5 clientes gerados via JS -->
+          </div>
+        </div>
+
+        <!-- BLOCO 5: AVISAR A BASE -->
+        <div class="cartao mb-16">
+          <h3>5. Avisar a base</h3>
+          <p class="texto-miudo mb-16">Dispare uma mensagem aos clientes que pediram aviso:</p>
+
+          <div class="campo-bloco">
+            <label class="rotulo-campo" for="aviso-saida-horario">Horário de saída</label>
+            <input type="text" id="aviso-saida-horario" class="entrada-texto" value="15h40">
+          </div>
+
+          <div class="campo-bloco">
+            <label class="rotulo-campo" for="aviso-saida-portao">Portão</label>
+            <input type="text" id="aviso-saida-portao" class="entrada-texto" value="Portão 2">
+          </div>
+
+          <div class="campo-bloco">
+            <label class="rotulo-campo" for="aviso-saida-vagas">Lugares livres</label>
+            <input type="number" id="aviso-saida-vagas" class="entrada-texto" value="6">
+          </div>
+
+          <button class="botao-primario mb-12" onclick="dispararAvisoBase()">
+            Enviar aviso
+          </button>
+
+          <div id="resultado-envio-aviso" style="display:none;">
+            <div class="cartao-pequeno mb-12" style="background:#1E293B; border-left:4px solid #DB2777;">
+              <span class="texto-miudo texto-apagado">Prévia da mensagem:</span>
+              <p class="texto-destaque mt-8" id="texto-mensagem-disparada" style="font-size:14px; font-weight:600;"></p>
+            </div>
+            <div class="selo-verde" style="width:100%; justify-content:center; padding:12px; font-size:14px;">
+              ✓ Enviado para 486 clientes que pediram aviso
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOCO 6: EMERGÊNCIA -->
+        <div class="cartao mb-16">
+          <h3>6. Emergência</h3>
+          <p class="texto-miudo mb-16">Contatos a bordo para socorro imediato:</p>
+
+          <div class="campo-bloco">
+            <label class="rotulo-campo" for="seletor-van-emergencia">Selecione a van:</label>
+            <select id="seletor-van-emergencia" class="entrada-texto" onchange="trocarVanEmergencia(this.value)">
+              <option value="VAN 01">VAN 01 (Edson)</option>
+              <option value="VAN 02">VAN 02 (Wellington)</option>
+              <option value="VAN 03" selected>VAN 03 (Cláudio)</option>
+              <option value="VAN 04">VAN 04 (Rogério)</option>
+            </select>
+          </div>
+
+          <div id="lista-emergencia-passageiros" class="mb-16">
+            <!-- Gerado via JS -->
+          </div>
+
+          <a id="botao-ligacao-motorista" href="tel:13900000003" class="botao-secundario" style="border-color:#EF4444; color:#EF4444; min-height:50px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Ligar para o motorista
+          </a>
+        </div>
+
+        <!-- BLOCO 7: BUSCAS DE AMANHÃ -->
+        <div class="cartao mb-16">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h3>7. Buscas de amanhÃ£</h3>
+            <span class="selo-azul" id="badge-total-buscas">4 pedidos</span>
+          </div>
+          <p class="texto-miudo mb-16">Agendamentos de Praia Grande organizados por horário:</p>
+          <div id="agrupamento-buscas-amanha">
+            <!-- Agrupados por janela de horário via JS -->
+          </div>
+        </div>
+
+        <!-- BOTÕES FINAIS -->
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <button class="botao-primario" onclick="abrirTela('simulador')">
+            Quanto vocês ganham
+          </button>
+          <button class="botao-secundario" onclick="abrirTela('planos')">
+            Ver planos
+          </button>
+        </div>
+
+        <div class="rodape-geral">
+          Demonstração feita pela <a href="https://opusaitech.com" target="_blank" rel="noopener" class="link-rodape-assinatura">Opus AI</a> · sem vínculo oficial com a Bora de Van.
+        </div>
+      </section>
+
+
+      <!-- ==============================================
+           TELA 4: QUANTO VOCÊS GANHAM (O SIMULADOR)
+           ============================================== -->
+      <section id="tela-simulador" class="tela">
+        <div class="mb-16">
+          <div class="selo-rosa mb-8">Simulador de Faturamento</div>
+          <h2>Quanto vocês <span class="destaque-gradiente">ganham</span></h2>
+          <p class="texto-miudo">Ajuste os números da sua linha e veja a sobra real no bolso a cada mês.</p>
+        </div>
+
+        <!-- CAMPOS NUMÉRICOS COM BOTÕES - E + (VALORES INICIAIS DA ESPECIFICAÇÃO) -->
+        <div class="cartao mb-16">
+          <!-- VANS (4) -->
+          <div class="mb-16">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="rotulo-campo" style="margin:0;">Vans</span>
+              <span class="texto-miudo texto-apagado">inicial: (4)</span>
+            </div>
+            <div class="seletor-quantidade">
+              <button class="botao-mais-menos" onclick="atualizarParametroSimulador('vans', -1)">−</button>
+              <span id="valor-sim-vans" class="valor-quantidade-exibido">4</span>
+              <button class="botao-mais-menos" onclick="atualizarParametroSimulador('vans', 1)">+</button>
+            </div>
+          </div>
+
+          <!-- VIAGENS POR VAN POR DIA (4) -->
+          <div class="mb-16">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="rotulo-campo" style="margin:0;">Viagens por van por dia</span>
+              <span class="texto-miudo texto-apagado">inicial: (4)</span>
+            </div>
+            <div class="seletor-quantidade">
+              <button class="botao-mais-menos" onclick="atualizarParametroSimulador('viagens', -1)">−</button>
+              <span id="valor-sim-viagens" class="valor-quantidade-exibido">4</span>
+              <button class="botao-mais-menos" onclick="atualizarParametroSimulador('viagens', 1)">+</button>
+            </div>
+          </div>
+
+          <!-- LUGARES POR VAN (15) -->
+          <div class="mb-16">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="rotulo-campo" style="margin:0;">Lugares por van</span>
+              <span class="texto-miudo texto-apagado">inicial: (15)</span>
+            </div>
+            <div class="seletor-quantidade">
+              <button class="botao-mais-menos" onclick="atualizarParametroSimulador('lugares', -1)">−</button>
+              <span id="valor-sim-lugares" class="valor-quantidade-exibido">15</span>
+              <button class="botao-mais-menos" onclick="atualizarParametroSimulador('lugares', 1)">+</button>
+            </div>
+          </div>
+
+          <!-- LUGARES VAZIOS POR VIAGEM, HOJE (2) -->
+          <div class="mb-16">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="rotulo-campo" style="margin:0;">Lugares vazios por viagem, hoje</span>
+              <span class="texto-miudo texto-apagado">inicial: (2)</span>
+            </div>
+            <div class="seletor-quantidade">
+              <button class="botao-mais-menos" onclick="atualizarParametroSimulador('vazios', -1)">−</button>
+              <span id="valor-sim-vazios" class="valor-quantidade-exibido">2</span>
+              <button class="botao-mais-menos" onclick="atualizarParametroSimulador('vazios', 1)">+</button>
+            </div>
+          </div>
+
+          <!-- PASSAGEIROS QUE MARCAM E NÃO APARECEM, POR SEMANA (5) -->
+          <div class="mb-16">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="rotulo-campo" style="margin:0;">Passageiros que marcam e não aparecem, por semana</span>
+              <span class="texto-miudo texto-apagado">inicial: (5)</span>
+            </div>
+            <div class="seletor-quantidade">
+              <button class="botao-mais-menos" onclick="atualizarParametroSimulador('faltas', -1)">−</button>
+              <span id="valor-sim-faltas" class="valor-quantidade-exibido">5</span>
+              <button class="botao-mais-menos" onclick="atualizarParametroSimulador('faltas', 1)">+</button>
+            </div>
+          </div>
+
+          <!-- HORAS POR DIA QUE A CENTRAL PASSA NO WHATSAPP (4) -->
+          <div class="mb-16">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="rotulo-campo" style="margin:0;">Horas por dia que a central passa no WhatsApp</span>
+              <span class="texto-miudo texto-apagado">inicial: (4)</span>
+            </div>
+            <div class="seletor-quantidade">
+              <button class="botao-mais-menos" onclick="atualizarParametroSimulador('horas', -1)">−</button>
+              <span id="valor-sim-horas" class="valor-quantidade-exibido">4</span>
+              <button class="botao-mais-menos" onclick="atualizarParametroSimulador('horas', 1)">+</button>
+            </div>
+          </div>
+
+          <!-- TAXA POR PIX RECEBIDO, EM R$ (0,00) -->
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span class="rotulo-campo" style="margin:0;">Taxa por Pix recebido, em R$</span>
+              <span class="texto-miudo texto-apagado">inicial: (0,00)</span>
+            </div>
+            <div class="seletor-quantidade">
+              <button class="botao-mais-menos" onclick="atualizarTaxaSimulador(-0.25)">−</button>
+              <span id="valor-sim-taxa" class="valor-quantidade-exibido">0,00</span>
+              <button class="botao-mais-menos" onclick="atualizarTaxaSimulador(0.25)">+</button>
+            </div>
+            <p class="texto-miudo mt-8 texto-apagado">
+              0 se o Pix cai direto na conta de vocês; plataformas de pagamento cobram de R$ 1 a R$ 2 por Pix
+            </p>
+          </div>
+        </div>
+
+        <!-- CONTAS DETALHADAS (26 DIAS DE TRABALHO POR MÊS) -->
+        <div class="cartao mb-16">
+          <h3>Contas do mês</h3>
+          <p class="texto-miudo mb-16">Cálculos mensais com base em 26 dias de operação:</p>
+
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <!-- 1. Lugares que voltam a ser vendidos -->
+            <div style="border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="texto-destaque" style="font-weight:600;">Lugares que voltam a ser vendidos</span>
+                <span id="resultado-calc-lugares" class="texto-verde" style="font-weight:700; font-size:17px;">+ R$ 11.440</span>
+              </div>
+              <p class="texto-miudo mt-4 texto-apagado">o aviso enche 1 em cada 4 lugares vazios</p>
+            </div>
+
+            <!-- 2. Faltas evitadas -->
+            <div style="border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="texto-destaque" style="font-weight:600;">Faltas evitadas</span>
+                <span id="resultado-calc-faltas" class="texto-verde" style="font-weight:700; font-size:17px;">+ R$ 591</span>
+              </div>
+              <p class="texto-miudo mt-4 texto-apagado">metade de quem faltava paga antes</p>
+            </div>
+
+            <!-- 3. Tempo da central -->
+            <div style="border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="texto-destaque" style="font-weight:600;">Tempo da central</span>
+                <span id="resultado-calc-tempo" class="texto-verde" style="font-weight:700; font-size:17px;">+ R$ 624</span>
+              </div>
+              <p class="texto-miudo mt-4 texto-apagado">metade do tempo no WhatsApp volta para vocês (R$ 12/hora)</p>
+            </div>
+
+            <!-- 4. Custo do sistema -->
+            <div style="border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="texto-destaque" style="font-weight:600;">Custo do sistema</span>
+                <span id="resultado-calc-custo" class="texto-apagado" style="font-weight:700; font-size:17px;">− R$ 678</span>
+              </div>
+              <p class="texto-miudo mt-4 texto-apagado">implantação dividida por 12 + mensalidade das vans</p>
+            </div>
+
+            <!-- 5. Taxas de Pix (em vermelho) -->
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="texto-destaque" style="font-weight:600;">Taxas de Pix</span>
+                <span id="resultado-calc-taxas" class="texto-vermelho" style="font-weight:700; font-size:17px;">− R$ 0</span>
+              </div>
+              <p class="texto-miudo mt-4 texto-apagado">tarifa de intermediador por passagem</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. SOBRA NO BOLSO POR MÊS (NÚMERO GRANDE) -->
+        <div id="cartao-destaque-sobra" class="cartao alinhado-centro" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08);">
+          <span class="texto-miudo" style="color:#A7F3D0; font-weight:700; text-transform:uppercase; letter-spacing:1px;">Sobra no bolso por mês</span>
+          <div id="numero-grande-sobra" style="font-family:'Outfit',sans-serif; font-size:42px; font-weight:800; color:#10B981; margin:8px 0;">
+            R$ 11.977
+          </div>
+          <p id="frase-explicativa-sobra" class="texto-miudo" style="color:#D1FAE5;">
+            Lucro a mais todo mês garantido na ponta do lápis.
+          </p>
+        </div>
+
+        <button class="botao-primario mb-12" onclick="abrirTela('planos')">
+          Ver planos e valores
+        </button>
+
+        <div class="rodape-geral">
+          Demonstração feita pela <a href="https://opusaitech.com" target="_blank" rel="noopener" class="link-rodape-assinatura">Opus AI</a> · sem vínculo oficial com a Bora de Van.
+        </div>
+      </section>
+
+
+      <!-- ==============================================
+           TELA 5: PLANOS
+           ============================================== -->
+      <section id="tela-planos" class="tela">
+        <div class="mb-16 alinhado-centro">
+          <div class="selo-rosa mb-8">Condição Especial</div>
+          <h2>Plano <span class="destaque-gradiente">Fundador</span></h2>
+          <p class="texto-miudo">Exclusividade na rota e garantia de preço travado.</p>
+        </div>
+
+        <!-- UM CARTÃO SÓ COM PREÇO DE FUNDADOR EM DESTAQUE E NORMAL RISCADO -->
+        <div class="cartao" style="border: 2px solid #DB2777; box-shadow: 0 8px 32px rgba(219, 39, 119, 0.25);">
+          <!-- FRASE DE EXCLUSIVIDADE -->
+          <div class="cartao-pequeno mb-16 alinhado-centro" style="background: rgba(219, 39, 119, 0.12); border-color: #DB2777;">
+            <p style="font-size:15px; font-weight:700; color:#FFFFFF;">
+              Primeira empresa da linha Jabaquara ⇄ Praia Grande: exclusividade na rota por 12 meses.
+            </p>
+          </div>
+
+          <!-- BLOCO DE PREÇOS -->
+          <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:20px;">
+            <div style="background:#1E293B; border-radius:16px; padding:14px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <span class="texto-miudo texto-apagado">Implantação</span>
+                <div style="text-decoration:line-through; color:#64748B; font-size:15px; font-weight:600;">R$ 2.490</div>
+              </div>
+              <div style="text-align:right;">
+                <span class="selo-verde" style="font-size:11px; margin-bottom:2px;">Fundador</span>
+                <div style="font-family:'Outfit',sans-serif; font-size:26px; font-weight:800; color:#FFFFFF;">R$ 990</div>
+              </div>
+            </div>
+
+            <div style="background:#1E293B; border-radius:16px; padding:14px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <span class="texto-miudo texto-apagado">Por van, por mês</span>
+                <div style="text-decoration:line-through; color:#64748B; font-size:15px; font-weight:600;">R$ 249</div>
+              </div>
+              <div style="text-align:right;">
+                <span class="selo-verde" style="font-size:11px; margin-bottom:2px;">Fundador</span>
+                <div style="font-family:'Outfit',sans-serif; font-size:26px; font-weight:800; color:#FFFFFF;">R$ 149</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- O QUE ENTRA -->
+          <h4 style="color:#FFFFFF; margin-bottom:12px; font-size:16px;">O que entra:</h4>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:24px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="texto-verde" style="font-weight:700;">✓</span>
+              <span class="texto-destaque">QR Code por van</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="texto-verde" style="font-weight:700;">✓</span>
+              <span class="texto-destaque">cadastro e fidelidade</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="texto-verde" style="font-weight:700;">✓</span>
+              <span class="texto-destaque">Pix confirmado automático</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="texto-verde" style="font-weight:700;">✓</span>
+              <span class="texto-destaque">pacotes de 10 viagens</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="texto-verde" style="font-weight:700;">✓</span>
+              <span class="texto-destaque">rota no Waze</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="texto-verde" style="font-weight:700;">✓</span>
+              <span class="texto-destaque">aviso para a base</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="texto-verde" style="font-weight:700;">✓</span>
+              <span class="texto-destaque">painel da central</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="texto-verde" style="font-weight:700;">✓</span>
+              <span class="texto-destaque">contato de emergência</span>
+            </div>
+          </div>
+
+          <!-- BOTÃO VERMELHO ÚNICO -->
+          <a id="botao-adesao-empresa" href="https://wa.me/5500000000000?text=Quero%20o%20Bora%20de%20Van%202.0" target="_blank" rel="noopener" class="botao-primario" style="background:#EF4444; box-shadow:0 4px 16px rgba(239,68,68,0.35);">
+            Quero na minha empresa
+          </a>
+
+          <!-- LINHA PEQUENA -->
+          <p class="texto-miudo alinhado-centro mt-12 texto-apagado">
+            Sem fidelidade. Cancela quando quiser.
+          </p>
+        </div>
+
+        <div class="rodape-geral">
+          Demonstração feita pela <a href="https://opusaitech.com" target="_blank" rel="noopener" class="link-rodape-assinatura">Opus AI</a> · sem vínculo oficial com a Bora de Van.
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BARRA INFERIOR FIXA COM 4 ABAS -->
+    <nav id="barra-navegacao-inferior">
+      <button class="item-barra-inferior ativo" onclick="abrirTela('inicio')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Início</span>
+      </button>
+
+      <button class="item-barra-inferior" onclick="abrirTela('passageiro')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span>Passageiro</span>
+      </button>
+
+      <button class="item-barra-inferior" onclick="abrirTela('motorista')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="3"/>
+          <line x1="12" y1="2" x2="12" y2="9"/>
+          <line x1="12" y1="15" x2="12" y2="22"/>
+          <line x1="4.93" y1="4.93" x2="9.88" y2="9.88"/>
+          <line x1="14.12" y1="14.12" x2="19.07" y2="19.07"/>
+        </svg>
+        <span>Motorista</span>
+      </button>
+
+      <button class="item-barra-inferior" onclick="abrirTela('central')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+          <line x1="8" y1="21" x2="16" y2="21"/>
+          <line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        <span>Central</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- ==============================================
+       SCRIPT JAVASCRIPT
+       ============================================== -->
+  <script>
+    /* REGRA 7: OBJETO CONFIG NO INÍCIO DO SCRIPT EXATAMENTE CONFORME ESPECIFICADO */
+    const CONFIG = {
+      empresa: "Bora de Van",
+      linha: "Jabaquara ⇄ Praia Grande",
+      passagemPix: 55,
+      passagemCartao: 59,
+      pacote10: 500,            // 10 viagens pagas antes = R$ 50 cada
+      implantacaoFundador: 990,
+      implantacaoNormal: 2490,
+      mensalPorVanFundador: 149,
+      mensalPorVanNormal: 249,
+      whatsappContato: "5500000000000",   // será trocado depois
+      assinatura: "Opus AI",
+      siteAssinatura: "https://opusaitech.com"
+    };
+
+    /* REGRA 2: ARMAZENAMENTO SEGURO EM LOCALSTORAGE DENTRO DE TRY/CATCH */
+    function recuperarDado(chave, padrao) {
+      try {
+        const guardado = localStorage.getItem(chave);
+        return guardado ? JSON.parse(guardado) : padrao;
+      } catch (e) {
+        return padrao;
+      }
+    }
+    function salvarDado(chave, valor) {
+      try {
+        localStorage.setItem(chave, JSON.stringify(valor));
+      } catch (e) {
+        // Modo privado ou indisponível
+      }
+    }
+
+    /* COORDENADAS FICTÍCIAS APROXIMADAS DA TABELA */
+    const COORDENADAS_TABELA = {
+      "Boqueirão": { lat: -24.0070, lng: -46.4120 },
+      "Guilhermina": { lat: -24.0130, lng: -46.4200 },
+      "Aviação": { lat: -24.0210, lng: -46.4330 },
+      "Tupi": { lat: -24.0280, lng: -46.4450 },
+      "Ocian": { lat: -24.0370, lng: -46.4600 },
+      "Mirim": { lat: -24.0450, lng: -46.4780 },
+      "Caiçara": { lat: -24.0560, lng: -46.4980 },
+      "Real": { lat: -24.0640, lng: -46.5120 },
+      "Solemar": { lat: -24.0780, lng: -46.5390 },
+      "Canto do Forte": { lat: -24.0030, lng: -46.4040 },
+      "Maracanã": { lat: -24.0300, lng: -46.4700 },
+      "Vila Sônia": { lat: -24.0200, lng: -46.4550 }
+    };
+    const ENTRADA_PRAIA_GRANDE = { lat: -24.0058, lng: -46.4028 };
+
+    /* MOTORISTAS FICTÍCIOS */
+    const MOTORISTAS_FROTA = {
+      "VAN 01": "Edson",
+      "VAN 02": "Wellington",
+      "VAN 03": "Cláudio",
+      "VAN 04": "Rogério"
+    };
+
+    /* 13 PASSAGEIROS DA VAN 03 */
+    const DADOS_PASSAGEIROS_VAN03 = [
+      { id: 1, nome: "Ana Paula Souza", telefone: "(13) 9 0000-0007", bairro: "Boqueirão", endereco: "Rua das Flores, 120", referencia: "Perto da praia", pagamento: "Pago", viagens: 7, desembarcou: false, emergencia: "Paulo Souza (Esposo) · (13) 9 0000-0088" },
+      { id: 2, nome: "Marcos Vinícius Santos", telefone: "(13) 9 0000-0012", bairro: "Canto do Forte", endereco: "Av. Marechal Mallet, 450", referencia: "Ao lado da farmácia", pagamento: "Pago", viagens: 14, desembarcou: false, emergencia: "Maria Santos (Mãe) · (13) 9 0000-0089" },
+      { id: 3, nome: "Juliana Pereira Rocha", telefone: "(13) 9 0000-0015", bairro: "Boqueirão", endereco: "Rua Costa e Silva, 88", referencia: "Edifício Estrela", pagamento: "Pago", viagens: 13, desembarcou: false, emergencia: "André Rocha (Pai) · (13) 9 0000-0091" },
+      { id: 4, nome: "Carlos Eduardo Lima", telefone: "(13) 9 0000-0018", bairro: "Guilhermina", endereco: "Rua Copacabana, 310", referencia: "Padaria Central", pagamento: "Pago", viagens: 16, desembarcou: false, emergencia: "Renata Lima (Irmã) · (13) 9 0000-0090" },
+      { id: 5, nome: "Roberto Silva Alves", telefone: "(13) 9 0000-0021", bairro: "Guilhermina", endereco: "Rua Brasil, 520", referencia: "Próximo à feira", pagamento: "Pago", viagens: 11, desembarcou: false, emergencia: "Luciana Alves (Esposa) · (13) 9 0000-0092" },
+      { id: 6, nome: "Fernanda Cristina Dias", telefone: "(13) 9 0000-0024", bairro: "Aviação", endereco: "Av. Pres. Castelo Branco, 1420", referencia: "Quiosque 22", pagamento: "Pago", viagens: 4, desembarcou: false, emergencia: "" },
+      { id: 7, nome: "Thiago Henrique Costa", telefone: "(13) 9 0000-0027", bairro: "Tupi", endereco: "Rua Guimarães Rosa, 205", referencia: "Mercadinho", pagamento: "Pago", viagens: 3, desembarcou: false, emergencia: "" },
+      { id: 8, nome: "Camila Beatriz Ramos", telefone: "(13) 9 0000-0030", bairro: "Ocian", endereco: "Rua Dom Pedro II, 95", referencia: "Igreja Matriz", pagamento: "Pago", viagens: 8, desembarcou: false, emergencia: "Marcos Ramos (Irmão) · (13) 9 0000-0093" },
+      { id: 9, nome: "Lucas Gabriel Martins", telefone: "(13) 9 0000-0033", bairro: "Mirim", endereco: "Rua Gilberto Amado, 412", referencia: "Prefeitura", pagamento: "Pago", viagens: 2, desembarcou: false, emergencia: "" },
+      { id: 10, nome: "Patrícia Oliveira Lima", telefone: "(13) 9 0000-0036", bairro: "Maracanã", endereco: "Rua Padre Anchieta, 77", referencia: "Posto Ipiranga", pagamento: "Pago", viagens: 6, desembarcou: false, emergencia: "" },
+      { id: 11, nome: "Rafael Fernando Neves", telefone: "(13) 9 0000-0039", bairro: "Caiçara", endereco: "Rua São Domingos, 630", referencia: "Praça do Caiçara", pagamento: "Cartão", viagens: 1, desembarcou: false, emergencia: "Sônia Neves (Mãe) · (13) 9 0000-0094" },
+      { id: 12, nome: "Mariana Souza Gomes", telefone: "(13) 9 0000-0042", bairro: "Real", endereco: "Av. Marginal, 180", referencia: "Passarela", pagamento: "Pago", viagens: 5, desembarcou: false, emergencia: "" },
+      { id: 13, nome: "Rodrigo Mendes Duarte", telefone: "(13) 9 0000-0045", bairro: "Solemar", endereco: "Rua dos Coqueiros, 54", referencia: "Final da linha", pagamento: "Crédito", viagens: 9, desembarcou: false, emergencia: "" }
+    ];
+
+    /* SITUAÇÃO DAS VANS NA CENTRAL */
+    let SITUACOES_VANS = recuperarDado("bdv_situacoes_frota", {
+      "VAN 01": { situacao: "no terminal, 9/15", passageiros: 9 },
+      "VAN 02": { situacao: "em Praia Grande, desembarcando", passageiros: 15 },
+      "VAN 03": { situacao: "na estrada, saiu 18h23", passageiros: 13 },
+      "VAN 04": { situacao: "no terminal, 4/15", passageiros: 4 }
+    });
+
+    /* LISTA DE AGENDAMENTOS (BUSCAS DE AMANHÃ) */
+    let LISTA_BUSCAS = recuperarDado("bdv_lista_buscas_amanha", [
+      { id: 201, nome: "Mariana Dias", bairro: "Guilhermina", endereco: "Rua Copacabana, 102", janela: "6h–7h", adultos: 2, criancas: 0, bagagem: "mala pequena", whats: "(13) 9 0000-0051" },
+      { id: 202, nome: "João Pedro Santos", bairro: "Boqueirão", endereco: "Rua Pernambuco, 330", janela: "7h–8h", adultos: 1, criancas: 0, bagagem: "mochila", whats: "(13) 9 0000-0052" },
+      { id: 203, nome: "Beatriz Oliveira", bairro: "Ocian", endereco: "Av. Vicente de Carvalho, 45", janela: "8h–9h", adultos: 2, criancas: 1, bagagem: "mala grande", whats: "(13) 9 0000-0053" },
+      { id: 204, nome: "Antônio Ferreira", bairro: "Canto do Forte", endereco: "Rua Xixová, 80", janela: "14h–15h", adultos: 1, criancas: 0, bagagem: "mochila", whats: "(13) 9 0000-0054" }
+    ]);
+
+    let passageirosAtuais = recuperarDado("bdv_passageiros_van03", DADOS_PASSAGEIROS_VAN03);
+
+    /* VARIÁVEIS DE ESTADO LOCAL */
+    let vanSelecionadaMotorista = "VAN 03";
+    let ehClienteAna = false;
+    let janelaEscolhida1B = "7h–8h";
+    let bagagemEscolhida1B = "mochila";
+    let contAdultos1B = 1;
+    let contCriancas1B = 0;
+
+    /* PARÂMETROS DO SIMULADOR (INICIAIS DA ESPECIFICAÇÃO) */
+    let SIMULADOR = recuperarDado("bdv_simulador_params", {
+      vans: 4,
+      viagens: 4,
+      lugares: 15,
+      vazios: 2,
+      faltas: 5,
+      horas: 4,
+      taxaPix: 0.0
+    });
+
+    /* ==============================================
+       NAVEGAÇÃO PRINCIPAL
+       ============================================== */
+    function abrirTela(id) {
+      document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+      const elemento = document.getElementById('tela-' + id);
+      if (elemento) elemento.classList.add('ativa');
+
+      const abas = document.querySelectorAll('.item-barra-inferior');
+      abas.forEach(b => b.classList.remove('ativo'));
+      const indiceAbas = { 'inicio': 0, 'passageiro': 1, 'motorista': 2, 'central': 3 };
+      if (indiceAbas[id] !== undefined) {
+        abas[indiceAbas[id]].classList.add('ativo');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (id === 'motorista') carregarTelaMotorista();
+      if (id === 'central') carregarTelaCentral();
+      if (id === 'simulador') recalcularSimulador();
+    }
+
+    /* ==============================================
+       TELA 1: PASSAGEIRO
+       ============================================== */
+    function alternarOpcaoPassageiro(aba) {
+      const b1a = document.getElementById('botao-aba-1a');
+      const b1b = document.getElementById('botao-aba-1b');
+      const p1a = document.getElementById('painel-opcao-1a');
+      const p1b = document.getElementById('painel-opcao-1b');
+
+      if (aba === '1a') {
+        b1a.style.background = '#DB2777';
+        b1a.style.borderColor = '#DB2777';
+        b1b.style.background = '#0F172A';
+        b1b.style.borderColor = 'rgba(255,255,255,0.10)';
+        p1a.style.display = 'block';
+        p1b.style.display = 'none';
+      } else {
+        b1b.style.background = '#DB2777';
+        b1b.style.borderColor = '#DB2777';
+        b1a.style.background = '#0F172A';
+        b1a.style.borderColor = 'rgba(255,255,255,0.10)';
+        p1a.style.display = 'none';
+        p1b.style.display = 'block';
+
+        const dataInput = document.getElementById('ag-data-campo');
+        if (!dataInput.value) {
+          const amanha = new Date();
+          amanha.setDate(amanha.getDate() + 1);
+          dataInput.value = amanha.toISOString().split('T')[0];
+        }
+      }
+    }
+
+    function verificarNumeroPassageiro(texto) {
+      const digitos = texto.replace(/\D/g, '');
+      const aviso = document.getElementById('alerta-cliente-reconhecida');
+      if (digitos.endsWith('00000007') || digitos === '13900000007') {
+        ehClienteAna = true;
+        document.getElementById('campo-nome-1a').value = "Ana Paula Souza";
+        aviso.style.display = 'block';
+      } else {
+        ehClienteAna = false;
+        aviso.style.display = 'none';
+      }
+    }
+
+    function preencherClienteAna() {
+      const c = document.getElementById('campo-whats-1a');
+      c.value = "(13) 9 0000-0007";
+      verificarNumeroPassageiro(c.value);
+    }
+
+    function irParaEtapa(passo) {
+      document.getElementById('etapa-1').style.display = (passo === 1) ? 'block' : 'none';
+      document.getElementById('etapa-2').style.display = (passo === 2) ? 'block' : 'none';
+      document.getElementById('etapa-3').style.display = (passo === 3) ? 'block' : 'none';
+      document.getElementById('etapa-sucesso').style.display = 'none';
+
+      for (let i = 1; i <= 3; i++) {
+        const item = document.getElementById('progresso-passo-' + i);
+        item.className = 'pilula-passo';
+        if (i < passo) item.classList.add('concluido');
+        else if (i === passo) item.classList.add('ativo');
+      }
+    }
+
+    function prosseguirEtapa1() {
+      const nome = document.getElementById('campo-nome-1a').value.trim();
+      const lgpd = document.getElementById('check-lgpd-1a').checked;
+      if (!lgpd) {
+        alert("É necessário autorizar os dados (LGPD) para prosseguir.");
+        return;
+      }
+      if (!nome) {
+        alert("Por favor, informe seu nome.");
+        return;
+      }
+
+      if (ehClienteAna) {
+        document.getElementById('campo-bairro-1a').value = "Boqueirão";
+        document.getElementById('campo-endereco-1a').value = "Rua das Flores";
+        document.getElementById('campo-numero-1a').value = "120";
+        document.getElementById('campo-referencia-1a').value = "Perto da praia";
+        document.getElementById('texto-exibe-destino').innerText = "Boqueirão · Rua das Flores, 120 (Perto da praia)";
+        irParaEtapa(3);
+      } else {
+        irParaEtapa(2);
+      }
+    }
+
+    function prosseguirEtapa2() {
+      const bairro = document.getElementById('campo-bairro-1a').value;
+      const end = document.getElementById('campo-endereco-1a').value.trim();
+      const num = document.getElementById('campo-numero-1a').value.trim();
+
+      if (!end || !num) {
+        alert("Preencha o endereço e número.");
+        return;
+      }
+
+      document.getElementById('texto-exibe-destino').innerText = `${bairro} · ${end}, ${num}`;
+      irParaEtapa(3);
+    }
+
+    function trocarEnderecoSalvo() {
+      irParaEtapa(2);
+    }
+
+    function abrirPagamentoPix() {
+      document.getElementById('detalhes-pix').style.display = 'block';
+      document.getElementById('detalhes-cartao').style.display = 'none';
+      document.getElementById('detalhes-credito').style.display = 'none';
+
+      const esp = document.getElementById('aviso-esperando-pix');
+      const conf = document.getElementById('aviso-pix-confirmado');
+      esp.style.display = 'block';
+      conf.style.display = 'none';
+
+      // Depois de 3 segundos, troca sozinho para ✓ verde "Pagamento confirmado"
+      setTimeout(() => {
+        esp.style.display = 'none';
+        conf.style.display = 'flex';
+        setTimeout(() => {
+          finalizarPassageiro('Pix');
+        }, 900);
+      }, 3000);
+    }
+
+    function copiarCodigoPix() {
+      const c = document.getElementById('codigo-pix-copia');
+      c.select();
+      try { navigator.clipboard.writeText(c.value); } catch (e) {}
+      const btn = document.getElementById('botao-copiar-codigo-pix');
+      btn.innerText = "Copiado!";
+      btn.style.color = "#10B981";
+      setTimeout(() => {
+        btn.innerText = "Copiar";
+        btn.style.color = "#F1F5F9";
+      }, 2500);
+    }
+
+    function abrirPagamentoCartao() {
+      document.getElementById('detalhes-cartao').style.display = 'block';
+      document.getElementById('detalhes-pix').style.display = 'none';
+      document.getElementById('detalhes-credito').style.display = 'none';
+    }
+
+    function abrirPagamentoCredito() {
+      document.getElementById('detalhes-credito').style.display = 'block';
+      document.getElementById('detalhes-pix').style.display = 'none';
+      document.getElementById('detalhes-cartao').style.display = 'none';
+    }
+
+    function finalizarPassageiro(forma) {
+      document.getElementById('etapa-1').style.display = 'none';
+      document.getElementById('etapa-2').style.display = 'none';
+      document.getElementById('etapa-3').style.display = 'none';
+      document.getElementById('etapa-sucesso').style.display = 'block';
+
+      for (let i = 1; i <= 3; i++) {
+        document.getElementById('progresso-passo-' + i).className = 'pilula-passo concluido';
+      }
+
+      const qtdCarimbos = ehClienteAna ? 7 : 1;
+      document.getElementById('rotulo-selo-fidelidade').innerText = `${qtdCarimbos} de 10`;
+      document.getElementById('frase-carimbos-fidelidade').innerText = `${qtdCarimbos} de 10 — a 10ª é por nossa conta`;
+
+      const grade = document.getElementById('grade-carimbos-conteudo');
+      grade.innerHTML = '';
+      for (let i = 1; i <= 10; i++) {
+        const item = document.createElement('div');
+        item.className = 'carimbo-bolinha' + (i <= qtdCarimbos ? ' marcado' : '');
+        item.innerHTML = (i <= qtdCarimbos) ? '✓' : i;
+        grade.appendChild(item);
+      }
+    }
+
+    function alternarGavetaEmergencia() {
+      const gaveta = document.getElementById('gaveta-emergencia');
+      gaveta.classList.toggle('aberto');
+    }
+
+    function gravarContatoEmergencia() {
+      const n = document.getElementById('emg-nome-campo').value.trim();
+      const t = document.getElementById('emg-tel-campo').value.trim();
+      if (!n || !t) {
+        alert("Informe nome e telefone de emergência.");
+        return;
+      }
+      const passageiroAna = passageirosAtuais.find(p => p.telefone.includes('0007'));
+      if (passageiroAna) {
+        passageiroAna.emergencia = `${n} · ${t}`;
+        salvarDado("bdv_passageiros_van03", passageirosAtuais);
+      }
+      alert("Contato de emergência salvo com sucesso!");
+    }
+
+    /* FLUXO 1B */
+    function marcarJanela(janela, btn) {
+      janelaEscolhida1B = janela;
+      document.querySelectorAll('.item-opcao-janela').forEach(b => {
+        b.style.background = '#0F172A';
+        b.style.borderColor = 'rgba(255,255,255,0.10)';
+        b.style.color = '#F1F5F9';
+      });
+      btn.style.background = '#DB2777';
+      btn.style.borderColor = '#DB2777';
+      btn.style.color = '#FFFFFF';
+    }
+
+    function mudarQtdPessoas(tipo, delta) {
+      if (tipo === 'adultos') {
+        contAdultos1B = Math.max(1, Math.min(10, contAdultos1B + delta));
+        document.getElementById('valor-adultos-1b').innerText = contAdultos1B;
+      } else {
+        contCriancas1B = Math.max(0, Math.min(10, contCriancas1B + delta));
+        document.getElementById('valor-criancas-1b').innerText = contCriancas1B;
+      }
+    }
+
+    function marcarBagagem(bag, btn) {
+      bagagemEscolhida1B = bag;
+      document.querySelectorAll('.item-opcao-bagagem').forEach(b => {
+        b.style.background = '#0F172A';
+        b.style.borderColor = 'rgba(255,255,255,0.10)';
+        b.style.color = '#F1F5F9';
+      });
+      btn.style.background = '#DB2777';
+      btn.style.borderColor = '#DB2777';
+      btn.style.color = '#FFFFFF';
+    }
+
+    function concluirAgendamento1B() {
+      const nome = document.getElementById('ag-nome-campo').value.trim();
+      const whats = document.getElementById('ag-whats-campo').value.trim();
+      const bairro = document.getElementById('ag-bairro-campo').value;
+      const end = document.getElementById('ag-endereco-campo').value.trim();
+      const lgpd = document.getElementById('check-lgpd-1b').checked;
+
+      if (!lgpd) {
+        alert("É necessário concordar com a LGPD.");
+        return;
+      }
+      if (!nome || !end) {
+        alert("Preencha seu nome e endereço de busca.");
+        return;
+      }
+
+      const pedido = {
+        id: Date.now(),
+        nome: nome,
+        bairro: bairro,
+        endereco: end,
+        janela: janelaEscolhida1B,
+        adultos: contAdultos1B,
+        criancas: contCriancas1B,
+        bagagem: bagagemEscolhida1B,
+        whats: whats || "(13) 9 0000-0099"
+      };
+
+      LISTA_BUSCAS.unshift(pedido);
+      salvarDado("bdv_lista_buscas_amanha", LISTA_BUSCAS);
+
+      document.getElementById('formulario-agendamento-1b').style.display = 'none';
+      document.getElementById('sucesso-agendamento-1b').style.display = 'block';
+    }
+
+
+    /* ==============================================
+       TELA 2: MOTORISTA
+       ============================================== */
+    function trocarVanAtiva(van) {
+      vanSelecionadaMotorista = van;
+      document.querySelectorAll('.seletor-van-item').forEach(b => {
+        if (b.innerText.trim() === van) {
+          b.style.background = '#DB2777';
+          b.style.borderColor = '#DB2777';
+        } else {
+          b.style.background = '#0F172A';
+          b.style.borderColor = 'rgba(255,255,255,0.10)';
+        }
+      });
+      carregarTelaMotorista();
+    }
+
+    function avisarSaidaTerminal() {
+      const agora = new Date();
+      const horaFormatada = agora.getHours().toString().padStart(2, '0') + 'h' + agora.getMinutes().toString().padStart(2, '0');
+      document.getElementById('quadro-aviso-central').style.display = 'block';
+      document.getElementById('texto-aviso-central-hora').innerText = `Central avisada às ${horaFormatada}`;
+
+      SITUACOES_VANS[vanSelecionadaMotorista].situacao = `na estrada, saiu ${horaFormatada}`;
+      salvarDado("bdv_situacoes_frota", SITUACOES_VANS);
+    }
+
+    function avisarChegadaPG() {
+      const agora = new Date();
+      const horaFormatada = agora.getHours().toString().padStart(2, '0') + 'h' + agora.getMinutes().toString().padStart(2, '0');
+      document.getElementById('quadro-aviso-central').style.display = 'block';
+      document.getElementById('texto-aviso-central-hora').innerText = `Central avisada às ${horaFormatada}`;
+
+      SITUACOES_VANS[vanSelecionadaMotorista].situacao = `em Praia Grande, desembarcando`;
+      salvarDado("bdv_situacoes_frota", SITUACOES_VANS);
+    }
+
+    function alternarDesembarquePassageiro(id) {
+      const p = passageirosAtuais.find(item => item.id === id);
+      if (p) {
+        p.desembarcou = !p.desembarcou;
+        salvarDado("bdv_passageiros_van03", passageirosAtuais);
+        carregarTelaMotorista();
+      }
+    }
+
+    /* ORDENAÇÃO POR VIZINHO MAIS PRÓXIMO (NEAREST NEIGHBOR) */
+    function executarOrdenacaoVizinhoProximo() {
+      let pontoAtual = { lat: ENTRADA_PRAIA_GRANDE.lat, lng: ENTRADA_PRAIA_GRANDE.lng };
+      let restantes = [...passageirosAtuais];
+      let ordenados = [];
+
+      while (restantes.length > 0) {
+        let menorDist = Infinity;
+        let indiceMaisPerto = -1;
+
+        for (let i = 0; i < restantes.length; i++) {
+          const c = COORDENADAS_TABELA[restantes[i].bairro] || ENTRADA_PRAIA_GRANDE;
+          const dist = Math.pow(c.lat - pontoAtual.lat, 2) + Math.pow(c.lng - pontoAtual.lng, 2);
+          if (dist < menorDist) {
+            menorDist = dist;
+            indiceMaisPerto = i;
+          }
+        }
+
+        if (indiceMaisPerto !== -1) {
+          const removido = restantes.splice(indiceMaisPerto, 1)[0];
+          ordenados.push(removido);
+          const c = COORDENADAS_TABELA[removido.bairro] || ENTRADA_PRAIA_GRANDE;
+          pontoAtual = { lat: c.lat, lng: c.lng };
+        } else {
+          break;
+        }
+      }
+
+      passageirosAtuais = ordenados;
+      salvarDado("bdv_passageiros_van03", passageirosAtuais);
+      carregarTelaMotorista();
+
+      document.getElementById('rotulo-ajuda-rota').innerText = "✓ Rota organizada por vizinho mais próximo a partir da entrada da cidade.";
+    }
+
+    function carregarTelaMotorista() {
+      const motoristaNome = MOTORISTAS_FROTA[vanSelecionadaMotorista] || "Motorista";
+      document.getElementById('tag-motorista-van').innerText = `${vanSelecionadaMotorista} · ${motoristaNome}`;
+
+      const listaDiv = document.getElementById('lista-paradas-conteudo');
+      listaDiv.innerHTML = '';
+
+      if (vanSelecionadaMotorista === "VAN 03") {
+        document.getElementById('titulo-viagem-motorista').innerText = "18h20 · Jabaquara → Praia Grande";
+        document.getElementById('subtitulo-viagem-motorista').innerText = "13 de 15 lugares · 12 pagos · 1 no cartão";
+
+        // Ordena visualmente: não desembarcados primeiro (no topo)
+        const ordenacaoExibicao = [...passageirosAtuais].sort((a, b) => {
+          if (a.desembarcou === b.desembarcou) return 0;
+          return a.desembarcou ? 1 : -1;
+        });
+
+        ordenacaoExibicao.forEach((p, idx) => {
+          const coord = COORDENADAS_TABELA[p.bairro] || ENTRADA_PRAIA_GRANDE;
+          const telNum = "55" + p.telefone.replace(/\D/g, '');
+          const primNome = p.nome.split(' ')[0];
+          const mensagemWpp = encodeURIComponent(`Oi, ${primNome}! Aqui é o ${motoristaNome} da Bora de Van. Chego em uns 5 minutos. 🚐`);
+
+          const wazeUrl = `https://waze.com/ul?ll=${coord.lat},${coord.lng}&navigate=yes`;
+          const whatsUrl = `https://wa.me/${telNum}?text=${mensagemWpp}`;
+
+          let seloEstilo = 'selo-verde';
+          if (p.pagamento === 'Cartão') seloEstilo = 'selo-amarelo';
+          if (p.pagamento === 'Crédito') seloEstilo = 'selo-azul';
+
+          const card = document.createElement('div');
+          card.className = 'cartao-parada' + (p.desembarcou ? ' concluida' : '');
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <strong style="color:#FFFFFF; font-size:15px;">${idx + 1} · ${p.bairro}</strong>
+                <div style="color:#E2E8F0; font-size:14px; margin-top:2px;">${p.endereco}</div>
+                <div class="texto-miudo texto-apagado">${p.nome} · ${p.telefone}</div>
+              </div>
+              <span class="${seloEstilo}">${p.pagamento}</span>
+            </div>
+            <div class="acoes-parada">
+              <a href="${wazeUrl}" target="_blank" rel="noopener" class="botao-acao-rota botao-rota-waze">
+                Abrir no Waze
+              </a>
+              <a href="${whatsUrl}" target="_blank" rel="noopener" class="botao-acao-rota botao-rota-whats">
+                Avisar que estou chegando
+              </a>
+              <button class="botao-acao-rota botao-rota-desembarque" onclick="alternarDesembarquePassageiro(${p.id})">
+                ${p.desembarcou ? 'Desfazer' : 'Desembarcou ✓'}
+              </button>
+            </div>
+          `;
+          listaDiv.appendChild(card);
+        });
+
+        // Configuração da rota inteira no Google Maps (máximo 3 intermediárias)
+        const pendentes = passageirosAtuais.filter(p => !p.desembarcou);
+        if (pendentes.length > 0) {
+          const grupo = pendentes.slice(0, 4);
+          const destinoFinal = grupo[grupo.length - 1];
+          const coordDest = COORDENADAS_TABELA[destinoFinal.bairro] || ENTRADA_PRAIA_GRANDE;
+          const intermediarias = grupo.slice(0, grupo.length - 1);
+          const pontosMeio = intermediarias.map(item => {
+            const c = COORDENADAS_TABELA[item.bairro] || ENTRADA_PRAIA_GRANDE;
+            return `${c.lat},${c.lng}`;
+          }).join('|');
+
+          let urlMaps = `https://www.google.com/maps/dir/?api=1&origin=${ENTRADA_PRAIA_GRANDE.lat},${ENTRADA_PRAIA_GRANDE.lng}&destination=${coordDest.lat},${coordDest.lng}&travelmode=driving`;
+          if (pontosMeio) {
+            urlMaps += `&waypoints=${pontosMeio}`;
+          }
+          document.getElementById('botao-rota-google-maps').href = urlMaps;
+        }
+      } else {
+        document.getElementById('titulo-viagem-motorista').innerText = `${vanSelecionadaMotorista} · Saída da garagem`;
+        document.getElementById('subtitulo-viagem-motorista').innerText = `${SITUACOES_VANS[vanSelecionadaMotorista].situacao}`;
+        listaDiv.innerHTML = `
+          <div class="cartao-pequeno alinhado-centro">
+            <p class="texto-destaque">A ${vanSelecionadaMotorista} está ${SITUACOES_VANS[vanSelecionadaMotorista].situacao}.</p>
+            <p class="texto-miudo mt-8 texto-apagado">Selecione a VAN 03 para navegar na rota com 13 passageiros.</p>
+          </div>
+        `;
+      }
+    }
+
+
+    /* ==============================================
+       TELA 3: CENTRAL (O PAINEL DO DONO)
+       ============================================== */
+    function carregarTelaCentral() {
+      // 1. Vans agora
+      const divVans = document.getElementById('tabela-frota-central');
+      divVans.innerHTML = '';
+      for (const [van, dados] of Object.entries(SITUACOES_VANS)) {
+        const mot = MOTORISTAS_FROTA[van];
+        const card = document.createElement('div');
+        card.className = 'cartao-pequeno';
+        card.style.background = '#1E293B';
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="color:#FFFFFF; font-size:15px;">${van} · ${mot}</strong>
+              <div class="texto-miudo" style="color:#C4B5FD; margin-top:2px;">${dados.situacao}</div>
+            </div>
+            <span class="selo-verde">${dados.passageiros}/15 passageiros</span>
+          </div>
+        `;
+        divVans.appendChild(card);
+      }
+
+      // 2. Horários mais cheios (de 5h a 22h com picos às 7h e 18h)
+      const divHorarios = document.getElementById('linhas-horarios-pico');
+      divHorarios.innerHTML = '';
+      const faixas = [
+        { h: "5h", pct: 40 }, { h: "6h", pct: 75 }, { h: "7h", pct: 95, pico: true },
+        { h: "8h", pct: 85 }, { h: "9h", pct: 60 }, { h: "10h", pct: 50 },
+        { h: "11h", pct: 45 }, { h: "12h", pct: 55 }, { h: "13h", pct: 40 },
+        { h: "14h", pct: 30 }, { h: "15h", pct: 55 }, { h: "16h", pct: 70 },
+        { h: "17h", pct: 88 }, { h: "18h", pct: 100, pico: true }, { h: "19h", pct: 80 },
+        { h: "20h", pct: 65 }, { h: "21h", pct: 50 }, { h: "22h", pct: 35 }
+      ];
+      faixas.forEach(f => {
+        const l = document.createElement('div');
+        l.className = 'linha-grafico-barra';
+        l.innerHTML = `
+          <span class="rotulo-grafico">${f.h}</span>
+          <div class="pista-grafico">
+            <div class="preenchimento-grafico ${f.pico ? 'destaque-pico' : ''}" style="width: ${f.pct}%;"></div>
+          </div>
+          <span class="valor-grafico">${f.pct}%</span>
+        `;
+        divHorarios.appendChild(l);
+      });
+
+      // 3. Bairros mais pedidos (Top 5 com barra)
+      const divBairros = document.getElementById('linhas-top-bairros');
+      divBairros.innerHTML = '';
+      const rankingBairros = [
+        { nome: "Boqueirão", pct: 32 },
+        { nome: "Canto do Forte", pct: 24 },
+        { nome: "Guilhermina", pct: 18 },
+        { nome: "Ocian", pct: 15 },
+        { nome: "Caiçara", pct: 11 }
+      ];
+      rankingBairros.forEach(b => {
+        const l = document.createElement('div');
+        l.className = 'linha-grafico-barra';
+        l.innerHTML = `
+          <span class="rotulo-grafico" style="width:110px; font-size:14px; color:#F1F5F9;">${b.nome}</span>
+          <div class="pista-grafico">
+            <div class="preenchimento-grafico destaque-pico" style="width: ${b.pct * 2.8}%;"></div>
+          </div>
+          <span class="valor-grafico">${b.pct}%</span>
+        `;
+        divBairros.appendChild(l);
+      });
+
+      // 4. Clientes (5 nomes fictícios com nº de viagens)
+      const divClientes = document.getElementById('lista-clientes-destaque');
+      divClientes.innerHTML = '';
+      const listaTopClientes = [
+        { nome: "Ana Paula Souza", viagens: 18, bairro: "Boqueirão" },
+        { nome: "Carlos Eduardo Lima", viagens: 16, bairro: "Guilhermina" },
+        { nome: "Marcos Vinícius Santos", viagens: 14, bairro: "Canto do Forte" },
+        { nome: "Juliana Pereira Rocha", viagens: 13, bairro: "Boqueirão" },
+        { nome: "Roberto Silva Alves", viagens: 11, bairro: "Guilhermina" }
+      ];
+      listaTopClientes.forEach(c => {
+        const it = document.createElement('div');
+        it.className = 'cartao-pequeno';
+        it.style.background = '#1E293B';
+        it.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="color:#FFFFFF; font-size:14px;">${c.nome}</strong>
+              <div class="texto-miudo texto-apagado">${c.bairro}</div>
+            </div>
+            <span class="selo-rosa">${c.viagens} viagens</span>
+          </div>
+        `;
+        divClientes.appendChild(it);
+      });
+
+      // 6. Emergência
+      trocarVanEmergencia("VAN 03");
+
+      // 7. Buscas de amanhã
+      const divBuscas = document.getElementById('agrupamento-buscas-amanha');
+      const badgeCont = document.getElementById('badge-total-buscas');
+      divBuscas.innerHTML = '';
+      badgeCont.innerText = `${LISTA_BUSCAS.length} pedidos`;
+
+      const slots = ["6h–7h", "7h–8h", "8h–9h", "10h–11h", "14h–15h"];
+      slots.forEach(slot => {
+        const itensSlot = LISTA_BUSCAS.filter(p => p.janela === slot);
+        if (itensSlot.length > 0) {
+          const bloco = document.createElement('div');
+          bloco.className = 'mb-16';
+          bloco.innerHTML = `<div class="selo-azul mb-8">${slot}</div>`;
+
+          itensSlot.forEach(ped => {
+            const card = document.createElement('div');
+            card.className = 'cartao-pequeno mb-8';
+            card.style.background = '#1E293B';
+            card.innerHTML = `
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                  <strong style="color:#FFFFFF; font-size:15px;">${ped.nome}</strong>
+                  <div class="texto-destaque" style="font-size:14px;">${ped.bairro} · ${ped.endereco}</div>
+                  <div class="texto-miudo texto-apagado">${ped.adultos} adulto(s) · ${ped.bagagem} · ${ped.whats}</div>
+                </div>
+                <a href="https://wa.me/55${ped.whats.replace(/\D/g, '')}" target="_blank" rel="noopener" class="selo-verde" style="text-decoration:none; padding:6px 12px;">WhatsApp</a>
+              </div>
+            `;
+            bloco.appendChild(card);
+          });
+          divBuscas.appendChild(bloco);
+        }
+      });
+    }
+
+    function dispararAvisoBase() {
+      const h = document.getElementById('aviso-saida-horario').value.trim() || "15h40";
+      const p = document.getElementById('aviso-saida-portao').value.trim() || "Portão 2";
+      const v = document.getElementById('aviso-saida-vagas').value.trim() || "6";
+
+      const txt = `🚐 Van saindo ${h} do ${p} do Jabaquara para Praia Grande. ${v} lugares. Reserve: https://boradevan.com.br/reserva`;
+      document.getElementById('texto-mensagem-disparada').innerText = txt;
+      document.getElementById('resultado-envio-aviso').style.display = 'block';
+    }
+
+    function trocarVanEmergencia(van) {
+      const divEmg = document.getElementById('lista-emergencia-passageiros');
+      const btnLig = document.getElementById('botao-ligacao-motorista');
+      divEmg.innerHTML = '';
+
+      const telefones = {
+        "VAN 01": "13900000001",
+        "VAN 02": "13900000002",
+        "VAN 03": "13900000003",
+        "VAN 04": "13900000004"
+      };
+      btnLig.href = `tel:${telefones[van] || '13900000003'}`;
+      btnLig.innerText = `Ligar para o motorista ${MOTORISTAS_FROTA[van]}`;
+
+      if (van === "VAN 03") {
+        const comContato = passageirosAtuais.filter(p => p.emergencia && p.emergencia.length > 0);
+        comContato.forEach(p => {
+          const c = document.createElement('div');
+          c.className = 'cartao-pequeno mb-8';
+          c.style.background = '#1E293B';
+          c.innerHTML = `
+            <div style="font-weight:700; color:#FFFFFF; font-size:14px;">${p.nome} (${p.bairro})</div>
+            <div class="texto-miudo mt-4" style="color:#F472B6;">
+              🚨 Emergência: ${p.emergencia}
+            </div>
+          `;
+          divEmg.appendChild(c);
+        });
+      } else {
+        divEmg.innerHTML = `
+          <div class="cartao-pequeno alinhado-centro" style="background:#1E293B;">
+            <p class="texto-miudo texto-apagado">Nenhuma ocorrência registrada para a ${van}.</p>
+          </div>
+        `;
+      }
+    }
+
+
+    /* ==============================================
+       TELA 4: QUANTO VOCÊS GANHAM (SIMULADOR)
+       ============================================== */
+    function atualizarParametroSimulador(campo, delta) {
+      const faixas = {
+        vans: [1, 20],
+        viagens: [1, 10],
+        lugares: [10, 25],
+        vazios: [0, 10],
+        faltas: [0, 50],
+        horas: [0, 16]
+      };
+      const [minimo, maximo] = faixas[campo];
+      SIMULADOR[campo] = Math.max(minimo, Math.min(maximo, SIMULADOR[campo] + delta));
+      document.getElementById('valor-sim-' + campo).innerText = SIMULADOR[campo];
+      salvarDado("bdv_simulador_params", SIMULADOR);
+      recalcularSimulador();
+    }
+
+    function atualizarTaxaSimulador(delta) {
+      SIMULADOR.taxaPix = Math.max(0, Math.min(5, Math.round((SIMULADOR.taxaPix + delta) * 100) / 100));
+      document.getElementById('valor-sim-taxa').innerText = SIMULADOR.taxaPix.toFixed(2).replace('.', ',');
+      salvarDado("bdv_simulador_params", SIMULADOR);
+      recalcularSimulador();
+    }
+
+    function formatarMoeda(val) {
+      return Math.round(val).toLocaleString('pt-BR');
+    }
+
+    function recalcularSimulador() {
+      const v = SIMULADOR.vans;
+      const vg = SIMULADOR.viagens;
+      const lug = SIMULADOR.lugares;
+      const vaz = SIMULADOR.vazios;
+      const f = SIMULADOR.faltas;
+      const h = SIMULADOR.horas;
+      const taxa = SIMULADOR.taxaPix;
+
+      const pPix = CONFIG.passagemPix;
+      const impFund = CONFIG.implantacaoFundador;
+      const mensVan = CONFIG.mensalPorVanFundador;
+
+      // FÓRMULAS LITERAIS DA ESPECIFICAÇÃO (26 DIAS DE TRABALHO POR MÊS)
+      // 1. Lugares que voltam a ser vendidos = vans × viagens × vazios × 0,25 × passagemPix × 26
+      const lugaresRecuperados = v * vg * vaz * 0.25 * pPix * 26;
+
+      // 2. Faltas evitadas = faltas por semana × 4,3 × passagemPix × 0,5
+      const faltasPoupadas = f * 4.3 * pPix * 0.5;
+
+      // 3. Tempo da central = horas × 0,5 × 26 × 12
+      const tempoRecuperado = h * 0.5 * 26 * 12;
+
+      // 4. Custo do sistema = implantacaoFundador ÷ 12 + vans × mensalPorVanFundador
+      const custoTotalSistema = (impFund / 12) + (v * mensVan);
+
+      // 5. Taxas de Pix = vans × viagens × (lugares − vazios) × 26 × taxa
+      const passageirosReais = Math.max(0, lug - vaz);
+      const taxaTotalPix = v * vg * passageirosReais * 26 * taxa;
+
+      // 6. Sobra no bolso por mês = ganhos − custo do sistema − taxas de Pix
+      const ganhosTotais = lugaresRecuperados + faltasPoupadas + tempoRecuperado;
+      const sobraNoBolso = ganhosTotais - custoTotalSistema - taxaTotalPix;
+
+      // Exibição
+      document.getElementById('resultado-calc-lugares').innerText = `+ R$ ${formatarMoeda(lugaresRecuperados)}`;
+      document.getElementById('resultado-calc-faltas').innerText = `+ R$ ${formatarMoeda(faltasPoupadas)}`;
+      document.getElementById('resultado-calc-tempo').innerText = `+ R$ ${formatarMoeda(tempoRecuperado)}`;
+      document.getElementById('resultado-calc-custo').innerText = `− R$ ${formatarMoeda(custoTotalSistema)}`;
+      document.getElementById('resultado-calc-taxas').innerText = `− R$ ${formatarMoeda(taxaTotalPix)}`;
+
+      const quadroSobra = document.getElementById('cartao-destaque-sobra');
+      const numSobra = document.getElementById('numero-grande-sobra');
+      const msgSobra = document.getElementById('frase-explicativa-sobra');
+
+      if (sobraNoBolso >= 0) {
+        quadroSobra.style.borderColor = "rgba(16, 185, 129, 0.4)";
+        quadroSobra.style.background = "rgba(16, 185, 129, 0.08)";
+        numSobra.style.color = "#10B981";
+        numSobra.innerText = `R$ ${formatarMoeda(sobraNoBolso)}`;
+        msgSobra.style.color = "#D1FAE5";
+        msgSobra.innerText = "Lucro a mais todo mês garantido na ponta do lápis.";
+      } else {
+        quadroSobra.style.borderColor = "rgba(148, 163, 184, 0.3)";
+        quadroSobra.style.background = "#1E293B";
+        numSobra.style.color = "#94A3B8";
+        numSobra.innerText = `R$ ${formatarMoeda(sobraNoBolso)}`;
+        msgSobra.style.color = "#CBD5E1";
+        msgSobra.innerText = "Com essa taxa de Pix, vale usar o Pix do banco de vocês para a passagem avulsa e deixar a plataforma de pagamento só para pacotes.";
+      }
+    }
+
+
+    /* ==============================================
+       INICIALIZAÇÃO GERAL E VINCULAÇÃO AO CONFIG
+       ============================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      // Injeta valores dinâmicos do CONFIG nos elementos correspondentes
+      document.querySelectorAll('.dado-preco-pix').forEach(el => el.innerText = CONFIG.passagemPix);
+      document.querySelectorAll('.dado-preco-cartao').forEach(el => el.innerText = CONFIG.passagemCartao);
+
+      // Botão Quero na minha empresa (Tela 5)
+      const botaoAdesao = document.getElementById('botao-adesao-empresa');
+      if (botaoAdesao) {
+        botaoAdesao.href = `https://wa.me/${CONFIG.whatsappContato}?text=Quero%20o%20Bora%20de%20Van%202.0`;
+      }
+
+      // Rodapé oficial
+      document.querySelectorAll('.link-rodape-assinatura').forEach(el => {
+        el.href = CONFIG.siteAssinatura;
+        el.innerText = CONFIG.assinatura;
+      });
+
+      // Inicializa cálculos
+      recalcularSimulador();
+    });
+  </script>
+</body>
+</html>
